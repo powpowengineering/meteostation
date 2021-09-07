@@ -35,7 +35,7 @@ float r2 = 30;
 float vbat = 0.0;            // calculated voltage			  
 
 
-//#define DEBUG 1 //debug switch between printing and sd card
+
 /********************************************************************/
 
 const uint8_t t_deviceAddress[5][8] = 
@@ -47,9 +47,9 @@ const uint8_t t_deviceAddress[5][8] =
     { 0x28, 0x17, 0x62, 0x80, 0x12, 0x21, 0x01, 0xd5 } //4
 };
 
-const uint8_t* t1_deviceAddress = t_deviceAddress[3];
-const uint8_t* t2_deviceAddress = t_deviceAddress[4];
-const uint8_t* t3_deviceAddress = t_deviceAddress[2];
+const uint8_t* t1_deviceAddress = t_deviceAddress[4];
+const uint8_t* t2_deviceAddress = t_deviceAddress[2];
+const uint8_t* t3_deviceAddress = t_deviceAddress[0];
 
 //button addresses analogread()
 const int buttonDOWN = 372; //shitty
@@ -105,6 +105,9 @@ void setup()
 
     pinMode(PIN_INT_ALARM, INPUT);// пин для внешнего прерывания от RTC
     pinMode(PIN_INT_BUTTON, INPUT);// пин для внешнего прерывания от button
+    pinMode(PIN_CS_SD_CARD_1, OUTPUT); 
+    pinMode(PIN_CS_SD_CARD_2, OUTPUT);
+    pinMode(53, OUTPUT);
     set_sleep_mode(SLEEP_MODE_PWR_DOWN); // настройка режима сна
 
 
@@ -125,9 +128,9 @@ void setup()
     rtc.setA1Time(0,0,0,10,0x0e, false, false, false);//setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
     rtc.turnOnAlarm(1);
 
-	menuDate.date.day = 1;
-	menuDate.date.month = 1;
-	menuDate.date.year = 1;
+  	menuDate.date.day = 1;
+  	menuDate.date.month = 1;
+  	menuDate.date.year = 1;
 
     attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
     attachInterrupt(INT_BUTTON,isrButtonPressed,FALLING); // прерывание от button
@@ -157,7 +160,7 @@ void loop()
 
     if (true == alarmTime)
     {
-        ReadSensors(void);
+        ReadSensors();
         write2sd();
         alarmTime = false;
     }
@@ -179,10 +182,11 @@ void loop()
     {
         // читаем время RTC раз в секунду
         timeDelay = millis();
-        if ((timeDelay - timeDelayOld)>TIME_UPDATE_LCD_TIME)
+        if ((timeDelay - timeDelayOld)>1000)
         {
             timeCurrent = RTClib::now();  // чтение текущего времени
             timeDelayOld = timeDelay;
+			
         }
     }
 

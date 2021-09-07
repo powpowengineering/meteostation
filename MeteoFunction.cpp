@@ -84,22 +84,26 @@ void write2sd(void)
     static int count2 = 1;
     static uint32_t lt_day=0;
     static uint32_t lt_day1=0;
-    static String stringOne("datalog1.txt");
+    static String stringOne("d1.txt");
+	static String stringOne2("d1.txt");
     uint32_t currentUnixTime;				   
+
+  digitalWrite(PIN_CS_SD_CARD_1,HIGH);
+  digitalWrite(PIN_CS_SD_CARD_2,HIGH);
       
 	currentUnixTime = timeCurrent.unixtime();									  
     #ifdef DEBUG
     Serial.print("Initializing SD card #1...");
     #endif
-    if (SD.begin(PIN_CS_SD_CARD_1)) 
+    if (SD.begin(SPI_QUARTER_SPEED,PIN_CS_SD_CARD_1)) 
       {
         #ifdef DEBUG
             Serial.println("initialization done.");
         #endif
       
-        if ((reg==10) || ((currentUnixTime-lt_day)>(uint32_t)(SECONDS_IN_DAY)))
+        if ((reg>=10) || ((currentUnixTime-lt_day)>(uint32_t)(SECONDS_IN_DAY)))
         {
-            stringOne = "datalog"+String(count)+".txt"; //or .csv?
+            stringOne = "d"+String(count)+".txt"; //or .csv?
             count=count+1;
             reg = 0;
             lt_day = currentUnixTime;
@@ -138,7 +142,8 @@ void write2sd(void)
         else 
         {
           #ifdef DEBUG
-          Serial.println("Could not open file (writing).");
+          Serial.println("Could not open file on sd 1.");
+		  Serial.println(stringOne);
           #endif
         }
     }
@@ -156,22 +161,22 @@ void write2sd(void)
     Serial.print("Initializing SD card #2...");
     #endif
     
-    if ((reg2==10) || ((currentUnixTime-lt_day1)>(uint32_t)(SECONDS_IN_DAY)))
+    if ((reg2>=10) || ((currentUnixTime-lt_day1)>(uint32_t)(SECONDS_IN_DAY)))
     {
-        stringOne = "datalog"+String(count2)+".txt"; //or .csv?
+        stringOne2 = "d"+String(count2)+".txt"; //or .csv?
         count2=count2+1;
-        reg = 0;
+        reg2 = 0;
         lt_day1 = currentUnixTime;
     }
     reg2=reg2+1;
     
-    if (SD.begin(PIN_CS_SD_CARD_2)) 
+    if (SD.begin(SPI_QUARTER_SPEED,PIN_CS_SD_CARD_2)) 
       {
         #ifdef DEBUG
           Serial.println("initialization done.");
         #endif
       
-         myFile = SD.open(stringOne, FILE_WRITE);
+         myFile = SD.open(stringOne2, FILE_WRITE);
         if (myFile)
         {  
             cntWriteSD_2++;
@@ -203,7 +208,8 @@ void write2sd(void)
         else 
         {
           #ifdef DEBUG
-          Serial.println("Could not open file (writing).");
+          Serial.println("Could not open file on sd 2");
+		  Serial.println(stringOne2);
           #endif
         }
     }
@@ -740,10 +746,7 @@ void ReadSensors(void)
     Serial.print("Pressure_P: ");
     Serial.print(pressurePascals);
     Serial.println("Pa  ");     
-	   
-    Serial.print("Altitude: ");
-    Serial.print(altitude);
-    Serial.println("m  ");  
+	  
 	
     Serial.print("Humidity: ");
     Serial.print(humidity);
@@ -1056,5 +1059,5 @@ void SetAlarm(SCALE_enum  s, uint8_t  p)
     Serial.println(nextTimeAlarm);
 */
 
-    rtc.setA1Time(al_days,al_hours,al_minutes,al_seconds,0x0e, false, false, false);//setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
+    //rtc.setA1Time(al_days,al_hours,al_minutes,al_seconds,0x0e, false, false, false);//setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
 }// end of SetAlarm()																									
