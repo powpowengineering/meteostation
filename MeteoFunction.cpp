@@ -1045,7 +1045,7 @@ void SetAlarm(SCALE_enum  s, uint8_t  p)
           {
             nextTimeAlarm = unix_time + p*60;
           }
-          else {nextTimeAlarm = unix_time+p*360;}
+          else {nextTimeAlarm = unix_time+p*3600;}
 
     al_days = day(nextTimeAlarm);   
     al_hours = hour(nextTimeAlarm);
@@ -1058,6 +1058,6 @@ void SetAlarm(SCALE_enum  s, uint8_t  p)
     Serial.println(timeCurrent.unixtime());
     Serial.println(nextTimeAlarm);
 */
-
-    //rtc.setA1Time(al_days,al_hours,al_minutes,al_seconds,0x0e, false, false, false);//setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
+    //setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
+    rtc.setA1Time(al_days,al_hours,al_minutes,al_seconds,0x0, false, false, false);
 }// end of SetAlarm()																									
