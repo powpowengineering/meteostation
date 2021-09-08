@@ -168,6 +168,7 @@ void loop()
 
     if ((timeCurrent.unixtime() - timeOld.unixtime())>TIME_SCREEN_ON)
     {
+        SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
         rtc.checkIfAlarm(ALARM_1);// сбрасываем флаг ALARM_1
         attachInterrupt(INT_ALARM,isrAlarm,FALLING);  // прерывание от RTC
         attachInterrupt(INT_BUTTON,isrButtonPressed,FALLING); // прерывание от button
