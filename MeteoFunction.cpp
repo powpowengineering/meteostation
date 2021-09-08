@@ -95,7 +95,7 @@ void write2sd(void)
     #ifdef DEBUG
     Serial.print("Initializing SD card #1...");
     #endif
-    if (SD.begin(SPI_QUARTER_SPEED,PIN_CS_SD_CARD_1)) 
+    if (SD.begin(SPI_HALF_SPEED,PIN_CS_SD_CARD_1)) 
       {
         #ifdef DEBUG
             Serial.println("initialization done.");
@@ -170,7 +170,7 @@ void write2sd(void)
     }
     reg2=reg2+1;
     
-    if (SD.begin(SPI_QUARTER_SPEED,PIN_CS_SD_CARD_2)) 
+    if (SD.begin(SPI_HALF_SPEED,PIN_CS_SD_CARD_2)) 
       {
         #ifdef DEBUG
           Serial.println("initialization done.");
@@ -661,7 +661,7 @@ void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
     }
     else {snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq SEC   %d",alarm->period);
     snprintf(screenValue[9],LCD_NUM_SYMBOL_IN_ROW,"Cnt_1   %d",cntWriteSD_1);
-    snprintf(screenValue[10],LCD_NUM_SYMBOL_IN_ROW,"Cnt_1   %d",cntWriteSD_2);
+    snprintf(screenValue[10],LCD_NUM_SYMBOL_IN_ROW,"Cnt_2   %d",cntWriteSD_2);
   
 }// end of makeStringsForLCD()
 }
