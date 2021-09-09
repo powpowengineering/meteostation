@@ -240,8 +240,6 @@ void write2sd(void)
  void LCDShow(void)
 {
   static MENU_SCREEN menuLCD = MAIN_MENU;
-  Serial.println("Enter in LCDShow");
-  Serial.println(menuLCD);
 /*------------------------------ MAIN menu ----------------------------*/  
     if (MAIN_MENU == menuLCD)
     {
@@ -288,6 +286,11 @@ void write2sd(void)
                      //menuAlarm.state = SCALE; - commented because it was same in pasha's file
                     //printCurrentMenuOnLCD(menuLCD);       
                 }
+				else if ((SCREEN_TEMP1_POS == cursorPos)||(SCREEN_TEMP2_POS == cursorPos)||(SCREEN_TEMP3_POS == cursorPos)\
+						||(SCREEN_HUM_POS == cursorPos)||(SCREEN_PRES_POS == cursorPos)|| (SCREEN_VBAT_POS == cursorPos))
+				{
+					ReadSensors();
+				}
             }
 		printCurrentMenuOnLCD(menuLCD);
     }
@@ -632,7 +635,7 @@ void write2sd(void)
 // @Parameters   date,time,alarm -> parameters, which we need to show
 //**************************************************************************************************
 void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
-{Serial.println("Enter in makeStringsForLCD");
+{
     char str_temp[10];
 	char str_scale[6];				  
 	dtostrf(t1, 3, 1, str_temp);
@@ -771,7 +774,7 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
     DATE date;
     TIME time;
     ALARM alarm;
-    Serial.println("Enter in printCurrentMenuOnLCD");
+    
     if ( MAIN_MENU == menuLCD )
     { 
         menuDate.date.day = timeCurrent.day();
