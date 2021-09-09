@@ -90,7 +90,7 @@ void setup()
     lcd.setBacklight(true);
     lcd.setContrast(60);
     lcd.clear(true);
-    delay(1000);
+    delay(500);
     lcd.clear();
     lcd.setBacklight(false);
     lcd.setCursor(0,5);
@@ -139,7 +139,8 @@ void setup()
     //delay(200);
     //RAK811_sendMessage(RAK811_taransferMode);
    // delay(200);
-
+	ReadSensors();
+	pressAnyButton = true;
 }
 
 void loop()
@@ -147,7 +148,8 @@ void loop()
     if (true == pressAnyButton)
     {
         Serial.println("\r\npressAnyButton");    
-        ReadSensors();
+        timeCurrent = RTClib::now();  // чтение текущего времени
+		//ReadSensors();
         LCDShow();
         pressAnyButton = false;
         timeOld = timeCurrent;

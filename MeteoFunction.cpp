@@ -240,7 +240,8 @@ void write2sd(void)
  void LCDShow(void)
 {
   static MENU_SCREEN menuLCD = MAIN_MENU;
-  
+  Serial.println("Enter in LCDShow");
+  Serial.println(menuLCD);
 /*------------------------------ MAIN menu ----------------------------*/  
     if (MAIN_MENU == menuLCD)
     {
@@ -254,8 +255,6 @@ void write2sd(void)
                 }
                 cursorPos +=1;
             }
-                
-            printCurrentMenuOnLCD(menuLCD);
         }
         else if (BUTTON_UP == buttonNum)// up
            {
@@ -267,8 +266,6 @@ void write2sd(void)
                     }
                     cursorPos -=1;
                 }
-                    
-                printCurrentMenuOnLCD(menuLCD);
             }
         else if (BUTTON_SELECT == buttonNum)// select
             {
@@ -277,13 +274,13 @@ void write2sd(void)
                 {
                     menuLCD = DATE_MENU;
                     menuDate.state = DAY;
-                    printCurrentMenuOnLCD(menuLCD);
+                    
                 }
                 else if (SCREEN_TIME_POS == cursorPos) 
                 {
                     menuLCD = TIME_MENU;
 					menuTime.state = HOUR;
-					printCurrentMenuOnLCD(menuLCD);             
+					            
                 }
                 else if (SCREEN_ALARM_POS == cursorPos)
                 {
@@ -292,6 +289,7 @@ void write2sd(void)
                     //printCurrentMenuOnLCD(menuLCD);       
                 }
             }
+		printCurrentMenuOnLCD(menuLCD);
     }
 /*------------------------------ DATE menu ----------------------------*/
     else if (DATE_MENU == menuLCD)
@@ -634,7 +632,7 @@ void write2sd(void)
 // @Parameters   date,time,alarm -> parameters, which we need to show
 //**************************************************************************************************
 void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
-{
+{Serial.println("Enter in makeStringsForLCD");
     char str_temp[10];
 	char str_scale[6];				  
 	dtostrf(t1, 3, 1, str_temp);
@@ -773,7 +771,7 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
     DATE date;
     TIME time;
     ALARM alarm;
-    
+    Serial.println("Enter in printCurrentMenuOnLCD");
     if ( MAIN_MENU == menuLCD )
     { 
         menuDate.date.day = timeCurrent.day();
