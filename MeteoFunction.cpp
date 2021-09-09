@@ -696,7 +696,7 @@ void ReadSensors(void)
     // если датчик t2 подсоединен считываем температуру
 	if (true == sensors.requestTemperaturesByAddress(t2_deviceAddress))
 	{
-	  t2 = sensors.getTempC(t1_deviceAddress);
+	  t2 = sensors.getTempC(t2_deviceAddress);
 	}
 	else
 	{
@@ -1059,5 +1059,10 @@ void SetAlarm(SCALE_enum  s, uint8_t  p)
     Serial.println(nextTimeAlarm);
 */
     //setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
+    Serial.println(unix_time);
+    Serial.println(nextTimeAlarm);
+    Serial.println(al_days);
+    Serial.println(al_hours);
+    Serial.println(al_minutes);
     rtc.setA1Time(al_days,al_hours,al_minutes,al_seconds,0x0, false, false, false);
 }// end of SetAlarm()																									
