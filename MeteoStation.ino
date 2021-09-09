@@ -90,18 +90,12 @@ void setup()
     lcd.setBacklight(true);
     lcd.setContrast(60);
     lcd.clear(true);
-    delay(2000);
+    delay(1000);
     lcd.clear();
     lcd.setBacklight(false);
     lcd.setCursor(0,5);
-    lcd.setInverted(true);
-	lcd.print("  ");
+	
 
-    lcd.print("Hello ");
-	lcd.print("world!");
-    lcd.setInverted(false);
-    //lcd.println("\nI am here.");
-    lcd.print("\nI am here.", 1, 2);
 
     pinMode(PIN_INT_ALARM, INPUT);// пин для внешнего прерывания от RTC
     pinMode(PIN_INT_BUTTON, INPUT);// пин для внешнего прерывания от button
@@ -111,7 +105,10 @@ void setup()
     set_sleep_mode(SLEEP_MODE_PWR_DOWN); // настройка режима сна
 
 
-    sensors.begin();
+    sensors.begin();//датчики температуры
+	sensors.setResolution(t1_deviceAddress,12,true);
+	sensors.setResolution(t2_deviceAddress,12,true);
+	sensors.setResolution(t3_deviceAddress,12,true);
 
     barometer.begin(Wire, LPS25HB_I2C_ADDR_ALT);
 
@@ -122,9 +119,9 @@ void setup()
     rtc.setHour(BUILD_HOUR);     //установка часов
     rtc.setDate(BUILD_DAY);     // устанавливаем число
     rtc.setMonth(BUILD_MONTH);   // Устанавливаем месяц
-    rtc.setYear(BUILD_YEAR);    // Устанавливаем год
+    rtc.setYear(BUILD_YEAR-2000);    // Устанавливаем год
     rtc.setClockMode(false);    // установка режима 12/24h. True is 12-h, false is 24-hour.
-    DateTime timeCurrent_al = RTClib::now();
+   
     rtc.setA1Time(0,0,0,10,0x0e, false, false, false);//setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
     rtc.turnOnAlarm(1);
 
