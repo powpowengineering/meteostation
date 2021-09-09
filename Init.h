@@ -43,7 +43,7 @@
 #define TIME_SCREEN_ON            (10)//in seconds
 #define SECONDS_IN_DAY            (86400) 
 
-#define DEBUG 1 //debug switch between printing and sd card
+//#define DEBUG 1 //debug switch between printing and sd card
 
 typedef enum MENU_SCREEN_enum
 {
