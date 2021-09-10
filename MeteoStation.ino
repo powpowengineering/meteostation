@@ -94,8 +94,6 @@ void setup()
     lcd.clear();
     lcd.setBacklight(false);
     lcd.setCursor(0,5);
-	
-
 
     pinMode(PIN_INT_ALARM, INPUT);// пин для внешнего прерывания от RTC
     pinMode(PIN_INT_BUTTON, INPUT);// пин для внешнего прерывания от button
@@ -103,7 +101,6 @@ void setup()
     pinMode(PIN_CS_SD_CARD_2, OUTPUT);
     pinMode(53, OUTPUT);
     set_sleep_mode(SLEEP_MODE_PWR_DOWN); // настройка режима сна
-
 
     sensors.begin();//датчики температуры
 	sensors.setResolution(t1_deviceAddress,12,true);
@@ -125,9 +122,11 @@ void setup()
     rtc.setA1Time(0,0,0,10,0x0e, false, false, false);//setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
     rtc.turnOnAlarm(1);
 
-  	menuDate.date.day = 1;
-  	menuDate.date.month = 1;
-  	menuDate.date.year = 1;
+
+	timeCurrent = RTClib::now();  // чтение текущего времени
+  	menuDate.date.day = timeCurrent.day();
+  	menuDate.date.month = timeCurrent.month();
+  	menuDate.date.year =  timeCurrent.year()-2000;
 
     attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
     attachInterrupt(INT_BUTTON,isrButtonPressed,FALLING); // прерывание от button
