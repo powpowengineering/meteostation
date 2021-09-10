@@ -28,6 +28,12 @@
 #define PIN_CLK_RST              (36)
 
 #define LCD_NUMBER_PIXELS_WIDE_SYMBOL   (5)
+#define SCREEN_TEMP1_POS                (0)
+#define SCREEN_TEMP2_POS                (1)
+#define SCREEN_TEMP3_POS                (2)
+#define SCREEN_HUM_POS                  (3)
+#define SCREEN_PRES_POS                	(4)
+#define SCREEN_VBAT_POS                  (5)
 #define SCREEN_DATE_POS                 (6)
 #define SCREEN_TIME_POS                 (7)
 #define SCREEN_ALARM_POS                (8)

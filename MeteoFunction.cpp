@@ -240,7 +240,6 @@ void write2sd(void)
  void LCDShow(void)
 {
   static MENU_SCREEN menuLCD = MAIN_MENU;
-  
 /*------------------------------ MAIN menu ----------------------------*/  
     if (MAIN_MENU == menuLCD)
     {
@@ -254,8 +253,6 @@ void write2sd(void)
                 }
                 cursorPos +=1;
             }
-                
-            printCurrentMenuOnLCD(menuLCD);
         }
         else if (BUTTON_UP == buttonNum)// up
            {
@@ -267,8 +264,6 @@ void write2sd(void)
                     }
                     cursorPos -=1;
                 }
-                    
-                printCurrentMenuOnLCD(menuLCD);
             }
         else if (BUTTON_SELECT == buttonNum)// select
             {
@@ -277,13 +272,13 @@ void write2sd(void)
                 {
                     menuLCD = DATE_MENU;
                     menuDate.state = DAY;
-                    printCurrentMenuOnLCD(menuLCD);
+                    
                 }
                 else if (SCREEN_TIME_POS == cursorPos) 
                 {
                     menuLCD = TIME_MENU;
 					menuTime.state = HOUR;
-					printCurrentMenuOnLCD(menuLCD);             
+					            
                 }
                 else if (SCREEN_ALARM_POS == cursorPos)
                 {
@@ -291,7 +286,13 @@ void write2sd(void)
                      //menuAlarm.state = SCALE; - commented because it was same in pasha's file
                     //printCurrentMenuOnLCD(menuLCD);       
                 }
+				else if ((SCREEN_TEMP1_POS == cursorPos)||(SCREEN_TEMP2_POS == cursorPos)||(SCREEN_TEMP3_POS == cursorPos)\
+						||(SCREEN_HUM_POS == cursorPos)||(SCREEN_PRES_POS == cursorPos)|| (SCREEN_VBAT_POS == cursorPos))
+				{
+					ReadSensors();
+				}
             }
+		printCurrentMenuOnLCD(menuLCD);
     }
 /*------------------------------ DATE menu ----------------------------*/
     else if (DATE_MENU == menuLCD)
@@ -300,21 +301,21 @@ void write2sd(void)
         {
             if (DAY == menuDate.state)
             {
-                if (menuDate.date.day != 1)
+                if (menuDate.date.day > 1)
                 {
                     menuDate.date.day--;
                 }            
             }
             else if (MONTH == menuDate.state)
             {
-                if (menuDate.date.month != 1)
+                if (menuDate.date.month > 1)
                 {
                     menuDate.date.month--;
                 }
             }
             else if (YEAR == menuDate.state)
             {
-                if (menuDate.date.year != 0)
+                if (menuDate.date.year > 0)
                 {
                     menuDate.date.year--;
                 }
@@ -328,7 +329,7 @@ void write2sd(void)
             }
             else if (MONTH == menuDate.state)
             {
-                if (menuDate.date.month != 12)
+                if (menuDate.date.month < 12)
                 {
                     menuDate.date.month++;
 					
@@ -336,7 +337,7 @@ void write2sd(void)
             }
             else if (YEAR == menuDate.state)
             {
-                if (menuDate.date.year != 99)
+                if (menuDate.date.year < 99)
                 {
                     menuDate.date.year++;
                 }
@@ -638,19 +639,19 @@ void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
     char str_temp[10];
 	char str_scale[6];				  
 	dtostrf(t1, 3, 1, str_temp);
-	snprintf(screenValue[0],LCD_NUM_SYMBOL_IN_ROW,"t1      %s C",str_temp);
+	snprintf(screenValue[0],LCD_NUM_SYMBOL_IN_ROW,"t1    %5s^C",str_temp);
 	dtostrf(t2, 3, 1, str_temp);
-	snprintf(screenValue[1],LCD_NUM_SYMBOL_IN_ROW,"t2      %s C",str_temp);
+	snprintf(screenValue[1],LCD_NUM_SYMBOL_IN_ROW,"t2    %5s^C",str_temp);
 	dtostrf(t3, 3, 1, str_temp);
-	snprintf(screenValue[2],LCD_NUM_SYMBOL_IN_ROW,"t3      %s C",str_temp);
+	snprintf(screenValue[2],LCD_NUM_SYMBOL_IN_ROW,"t3    %5s^C",str_temp);
 	dtostrf(humidity, 3, 1, str_temp);
-	snprintf(screenValue[3],LCD_NUM_SYMBOL_IN_ROW,"Hum     %s %%",str_temp);
+	snprintf(screenValue[3],LCD_NUM_SYMBOL_IN_ROW,"Hum    %5s%%",str_temp);
 	dtostrf(pressurePascals, 6, 1, str_temp);
 	snprintf(screenValue[4],LCD_NUM_SYMBOL_IN_ROW,"P  %s hPa",str_temp);
     dtostrf(vbat, 4, 2, str_temp);
     snprintf(screenValue[5],LCD_NUM_SYMBOL_IN_ROW,"Vbat   %s V",str_temp);
-	snprintf(screenValue[6],LCD_NUM_SYMBOL_IN_ROW,"Date  %d.%d.%d",date->day,date->month,date->year);
-	snprintf(screenValue[7],LCD_NUM_SYMBOL_IN_ROW,"Time  %d:%d:%d",time->hour,time->minute,time->second);
+	snprintf(screenValue[6],LCD_NUM_SYMBOL_IN_ROW,"Date %2d.%2d.%2d",date->day,date->month,date->year);
+	snprintf(screenValue[7],LCD_NUM_SYMBOL_IN_ROW,"Time %2d:%2d:%2d",time->hour,time->minute,time->second);
 	if (alarm->scale == HOURS) 
     {
         snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq HOURS %d",alarm->period);
@@ -659,12 +660,15 @@ void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
     {
         snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq MIN   %d",alarm->period);
     }
-    else {snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq SEC   %d",alarm->period);
-    snprintf(screenValue[9],LCD_NUM_SYMBOL_IN_ROW,"Cnt_1   %d",cntWriteSD_1);
-    snprintf(screenValue[10],LCD_NUM_SYMBOL_IN_ROW,"Cnt_2   %d",cntWriteSD_2);
-  
+    else 
+	{
+		snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq SEC   %d",alarm->period);
+	}
+	
+	snprintf(screenValue[9],LCD_NUM_SYMBOL_IN_ROW,"Cnt_1  %u",cntWriteSD_1);
+    snprintf(screenValue[10],LCD_NUM_SYMBOL_IN_ROW,"Cnt_2  %u",cntWriteSD_2);
+
 }// end of makeStringsForLCD()
-}
 
 //**************************************************************************************************
 // @Function      ReadSensors()
@@ -778,14 +782,14 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
     { 
         menuDate.date.day = timeCurrent.day();
         menuDate.date.month = timeCurrent.month();
-        menuDate.date.year = timeCurrent.year();
+        menuDate.date.year = timeCurrent.year()-2000;
 		menuTime.time.hour = timeCurrent.hour();
         menuTime.time.minute = timeCurrent.minute();
         menuTime.time.second = timeCurrent.second();
 		
 		date.day = timeCurrent.day();
         date.month = timeCurrent.month();
-        date.year = timeCurrent.year();
+        date.year = timeCurrent.year()-2000;
         time.hour = timeCurrent.hour();
         time.minute = timeCurrent.minute();
         time.second = timeCurrent.second();
@@ -802,8 +806,6 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
            if (i == (cursorPos-firstRowPos)) 
            {
                 lcd.setInverted(true);	
-
-
            }
            else
            {
@@ -858,7 +860,7 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
     {
 		date.day = timeCurrent.day();
         date.month = timeCurrent.month();
-        date.year = timeCurrent.year();
+        date.year = timeCurrent.year()-2000;
         time.hour = menuTime.time.hour;
         time.minute = menuTime.time.minute;
         time.second = menuTime.time.second;
@@ -894,7 +896,7 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
     {
 		date.day = timeCurrent.day();
         date.month = timeCurrent.month();
-        date.year = timeCurrent.year();
+        date.year = timeCurrent.year()-2000;
         time.hour = timeCurrent.hour();
         time.minute = timeCurrent.minute();
         time.second = timeCurrent.second();

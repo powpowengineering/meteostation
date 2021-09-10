@@ -90,12 +90,10 @@ void setup()
     lcd.setBacklight(true);
     lcd.setContrast(60);
     lcd.clear(true);
-    delay(1000);
+    delay(500);
     lcd.clear();
     lcd.setBacklight(false);
     lcd.setCursor(0,5);
-	
-
 
     pinMode(PIN_INT_ALARM, INPUT);// пин для внешнего прерывания от RTC
     pinMode(PIN_INT_BUTTON, INPUT);// пин для внешнего прерывания от button
@@ -103,7 +101,6 @@ void setup()
     pinMode(PIN_CS_SD_CARD_2, OUTPUT);
     pinMode(53, OUTPUT);
     set_sleep_mode(SLEEP_MODE_PWR_DOWN); // настройка режима сна
-
 
     sensors.begin();//датчики температуры
 	sensors.setResolution(t1_deviceAddress,12,true);
@@ -121,14 +118,19 @@ void setup()
     rtc.setMonth(BUILD_MONTH);   // Устанавливаем месяц
     rtc.setYear(BUILD_YEAR-2000);    // Устанавливаем год
     rtc.setClockMode(false);    // установка режима 12/24h. True is 12-h, false is 24-hour.
-   
-    rtc.setA1Time(0,0,0,10,0x0e, false, false, false);//setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
-    rtc.turnOnAlarm(1);
 
-  	menuDate.date.day = 1;
-  	menuDate.date.month = 1;
-  	menuDate.date.year = 1;
-
+	timeCurrent = RTClib::now();  // чтение текущего времени
+  	menuDate.date.day = timeCurrent.day();
+  	menuDate.date.month = timeCurrent.month();
+  	menuDate.date.year =  timeCurrent.year()-2000;
+	
+	menuAlarm.alarm.scale = MIN;
+	menuAlarm.alarm.period = 15;
+	
+	
+	SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+	rtc.turnOnAlarm(1);
+	
     attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
     attachInterrupt(INT_BUTTON,isrButtonPressed,FALLING); // прерывание от button
 
@@ -139,7 +141,8 @@ void setup()
     //delay(200);
     //RAK811_sendMessage(RAK811_taransferMode);
    // delay(200);
-
+	ReadSensors();
+	pressAnyButton = true;
 }
 
 void loop()
@@ -147,7 +150,8 @@ void loop()
     if (true == pressAnyButton)
     {
         Serial.println("\r\npressAnyButton");    
-        ReadSensors();
+        timeCurrent = RTClib::now();  // чтение текущего времени
+		//ReadSensors();
         LCDShow();
         pressAnyButton = false;
         timeOld = timeCurrent;
@@ -170,6 +174,7 @@ void loop()
         attachInterrupt(INT_ALARM,isrAlarm,FALLING);  // прерывание от RTC
         attachInterrupt(INT_BUTTON,isrButtonPressed,FALLING); // прерывание от button
         lcd.clear();
+		lcd.setInverted(false);
         lcd.setCursor(0,2);
         lcd.print("Sleep");
         sleep_mode(); // Переводим МК в сон
