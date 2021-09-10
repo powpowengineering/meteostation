@@ -639,19 +639,19 @@ void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
     char str_temp[10];
 	char str_scale[6];				  
 	dtostrf(t1, 3, 1, str_temp);
-	snprintf(screenValue[0],LCD_NUM_SYMBOL_IN_ROW,"t1      %s C",str_temp);
+	snprintf(screenValue[0],LCD_NUM_SYMBOL_IN_ROW,"t1    %5s^C",str_temp);
 	dtostrf(t2, 3, 1, str_temp);
-	snprintf(screenValue[1],LCD_NUM_SYMBOL_IN_ROW,"t2      %s C",str_temp);
+	snprintf(screenValue[1],LCD_NUM_SYMBOL_IN_ROW,"t2    %5s^C",str_temp);
 	dtostrf(t3, 3, 1, str_temp);
-	snprintf(screenValue[2],LCD_NUM_SYMBOL_IN_ROW,"t3      %s C",str_temp);
+	snprintf(screenValue[2],LCD_NUM_SYMBOL_IN_ROW,"t3    %5s^C",str_temp);
 	dtostrf(humidity, 3, 1, str_temp);
-	snprintf(screenValue[3],LCD_NUM_SYMBOL_IN_ROW,"Hum     %s%%",str_temp);
+	snprintf(screenValue[3],LCD_NUM_SYMBOL_IN_ROW,"Hum    %5s%%",str_temp);
 	dtostrf(pressurePascals, 6, 1, str_temp);
 	snprintf(screenValue[4],LCD_NUM_SYMBOL_IN_ROW,"P  %s hPa",str_temp);
     dtostrf(vbat, 4, 2, str_temp);
     snprintf(screenValue[5],LCD_NUM_SYMBOL_IN_ROW,"Vbat   %s V",str_temp);
-	snprintf(screenValue[6],LCD_NUM_SYMBOL_IN_ROW,"Date %d.%d.%d",date->day,date->month,date->year);
-	snprintf(screenValue[7],LCD_NUM_SYMBOL_IN_ROW,"Time %d:%d:%d",time->hour,time->minute,time->second);
+	snprintf(screenValue[6],LCD_NUM_SYMBOL_IN_ROW,"Date %2d.%2d.%2d",date->day,date->month,date->year);
+	snprintf(screenValue[7],LCD_NUM_SYMBOL_IN_ROW,"Time %2d:%2d:%2d",time->hour,time->minute,time->second);
 	if (alarm->scale == HOURS) 
     {
         snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq HOURS %d",alarm->period);
@@ -660,12 +660,15 @@ void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
     {
         snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq MIN   %d",alarm->period);
     }
-    else {snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq SEC   %d",alarm->period);
-    snprintf(screenValue[9],LCD_NUM_SYMBOL_IN_ROW,"Cnt_1   %d",cntWriteSD_1);
-    snprintf(screenValue[10],LCD_NUM_SYMBOL_IN_ROW,"Cnt_2   %d",cntWriteSD_2);
-  
+    else 
+	{
+		snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq SEC   %d",alarm->period);
+	}
+	
+	snprintf(screenValue[9],LCD_NUM_SYMBOL_IN_ROW,"Cnt_1  %u",cntWriteSD_1);
+    snprintf(screenValue[10],LCD_NUM_SYMBOL_IN_ROW,"Cnt_2  %u",cntWriteSD_2);
+
 }// end of makeStringsForLCD()
-}
 
 //**************************************************************************************************
 // @Function      ReadSensors()

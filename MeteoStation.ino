@@ -118,16 +118,19 @@ void setup()
     rtc.setMonth(BUILD_MONTH);   // Устанавливаем месяц
     rtc.setYear(BUILD_YEAR-2000);    // Устанавливаем год
     rtc.setClockMode(false);    // установка режима 12/24h. True is 12-h, false is 24-hour.
-   
-    rtc.setA1Time(0,0,0,10,0x0e, false, false, false);//setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
-    rtc.turnOnAlarm(1);
-
 
 	timeCurrent = RTClib::now();  // чтение текущего времени
   	menuDate.date.day = timeCurrent.day();
   	menuDate.date.month = timeCurrent.month();
   	menuDate.date.year =  timeCurrent.year()-2000;
-
+	
+	menuAlarm.alarm.scale = MIN;
+	menuAlarm.alarm.period = 15;
+	
+	
+	SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+	rtc.turnOnAlarm(1);
+	
     attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
     attachInterrupt(INT_BUTTON,isrButtonPressed,FALLING); // прерывание от button
 
