@@ -803,8 +803,6 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
            if (i == (cursorPos-firstRowPos)) 
            {
                 lcd.setInverted(true);	
-
-
            }
            else
            {

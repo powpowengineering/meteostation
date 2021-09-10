@@ -172,6 +172,7 @@ void loop()
         attachInterrupt(INT_ALARM,isrAlarm,FALLING);  // прерывание от RTC
         attachInterrupt(INT_BUTTON,isrButtonPressed,FALLING); // прерывание от button
         lcd.clear();
+		lcd.setInverted(false);
         lcd.setCursor(0,2);
         lcd.print("Sleep");
         sleep_mode(); // Переводим МК в сон
