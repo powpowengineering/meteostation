@@ -10,13 +10,13 @@
 #include <avr/sleep.h>
 #include "buildTime.h" // для парсинга строки даты и времени, полученной при компиляции
 #include <Nokia_LCD.h> //nokia 5110 display
-//#include "ModuleRAK811.h"
+#include "ModuleRAK811.h"
 #include "Init.h"
 #include <math.h>
 #include <TimeLib.h>
 #include <EEPROM.h>
 
-/********************************************************************/				
+/********************************************************************/
 
 DATE_MENU_SCREEN menuDate;
 TIME_MENU_SCREEN menuTime;
@@ -32,13 +32,13 @@ int timeDelay = 0;
 int timeDelayOld = 0;
 float r1 = 11;
 float r2 = 30;
-float vbat = 0.0;            // calculated voltage			  
+float vbat = 0.0;            // calculated voltage
 
 
 
 /********************************************************************/
 
-const uint8_t t_deviceAddress[5][8] = 
+const uint8_t t_deviceAddress[5][8] =
 {
     { 0x28, 0xdb, 0x04, 0x75, 0xd0, 0x01, 0x3c, 0xd4 },//0
     { 0x28, 0x4b, 0xeb, 0x07, 0xb6, 0x01, 0x3c, 0x0b },//1
@@ -97,7 +97,7 @@ void setup()
 
     pinMode(PIN_INT_ALARM, INPUT);// пин для внешнего прерывания от RTC
     pinMode(PIN_INT_BUTTON, INPUT);// пин для внешнего прерывания от button
-    pinMode(PIN_CS_SD_CARD_1, OUTPUT); 
+    pinMode(PIN_CS_SD_CARD_1, OUTPUT);
     pinMode(PIN_CS_SD_CARD_2, OUTPUT);
     pinMode(53, OUTPUT);
     set_sleep_mode(SLEEP_MODE_PWR_DOWN); // настройка режима сна
@@ -123,24 +123,24 @@ void setup()
   	menuDate.date.day = timeCurrent.day();
   	menuDate.date.month = timeCurrent.month();
   	menuDate.date.year =  timeCurrent.year()-2000;
-	
+
 	menuAlarm.alarm.scale = MIN;
 	menuAlarm.alarm.period = 15;
-	
-	
+
+
 	SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
 	rtc.turnOnAlarm(1);
-	
+
     attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
     attachInterrupt(INT_BUTTON,isrButtonPressed,FALLING); // прерывание от button
 
-//    RAK811_init();
-  //  RAK811_sendMessage(RAK811_confMode);
-    //delay(200);
-    //RAK811_sendMessage(RAK811_confPrm);
-    //delay(200);
-    //RAK811_sendMessage(RAK811_taransferMode);
-   // delay(200);
+    RAK811_init();
+    RAK811_confMode(RAK811_MODE_LORA_P2P);
+    delay(1000);
+    RAK811_confP2Pprm("869525000",12,0,1,8,20);
+    delay(1000);
+    RAK811_confTransferMode(RAK811_SENDER_MODE);
+    delay(1000);
 	ReadSensors();
 	pressAnyButton = true;
 }
@@ -149,7 +149,7 @@ void loop()
 {
     if (true == pressAnyButton)
     {
-        Serial.println("\r\npressAnyButton");    
+        Serial.println("\r\npressAnyButton");
         timeCurrent = RTClib::now();  // чтение текущего времени
 		//ReadSensors();
         LCDShow();
@@ -157,6 +157,8 @@ void loop()
         timeOld = timeCurrent;
         timeDelay = millis();
         timeDelayOld = timeDelay;
+        RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
+       
     }
 
     if (true == alarmTime)
@@ -189,7 +191,7 @@ void loop()
         {
             timeCurrent = RTClib::now();  // чтение текущего времени
             timeDelayOld = timeDelay;
-			
+
         }
     }
 
