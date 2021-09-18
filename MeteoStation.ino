@@ -202,7 +202,7 @@ void loop()
 		dtostrf(humidity, 3, 1, str_temp_Hum);
 		dtostrf(pressurePascals, 6, 1, str_temp_P);
 		dtostrf(vbat, 4, 2, str_temp_Vbat);
-		snprintf(buf,256,"%2d.%2d.%2d|%2d:%2d:%2d|t1=%5s|Hum=%5s|P=%6s|Vbat=%4s|Cnt_1=%u|Cnt_2=%u\r\n",menuDate.date.day,menuDate.date.month,menuDate.date.year,\
+		snprintf(buf,256,"%2d.%2d.%2d|%2d:%2d:%2d|t1=%5s|Hum=%5s|P=%6s|Vbat=%4s|Cnt_1=%u|Cnt_2=%u",menuDate.date.day,menuDate.date.month,menuDate.date.year,\
 					menuTime.time.hour,menuTime.time.minute,menuTime.time.second,str_temp_t1,str_temp_Hum,str_temp_P,str_temp_Vbat,cntWriteSD_1,cntWriteSD_2);
 		//RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
         RAK811_sendData(buf);
@@ -225,7 +225,7 @@ void loop()
         lcd.print("Wakeup");
     }
     else
-    {
+    { 
         // читаем время RTC раз в секунду
         timeDelay = millis();
         if ((timeDelay - timeDelayOld)>1000)
