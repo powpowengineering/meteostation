@@ -143,6 +143,28 @@ void setup()
     delay(1000);
 	ReadSensors();
 	pressAnyButton = true;
+/*
+  char testitoa[20] = {"test itoa"};
+  char testBuf[64];
+  char* pdata = testitoa;
+  int size = strlen(testitoa);
+  uint8_t temp=0;
+  char *p = testBuf;
+  
+
+  for(int i=0;i<size;i++)
+  {
+      temp = (uint8_t)*pdata;
+      itoa(((temp&0xf0)>>4),p,16);
+      p++;
+      itoa((temp&0x0f),p,16);
+      pdata++;
+      p++;
+  }
+  Serial.print("testBuf =");
+  Serial.println(testBuf);
+  while(1);
+  */
 }
 
 void loop()
@@ -157,15 +179,34 @@ void loop()
         timeOld = timeCurrent;
         timeDelay = millis();
         timeDelayOld = timeDelay;
-        RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
+        //RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
        
     }
 
     if (true == alarmTime)
     {
+		char buf[256];
+		char str_temp_t1[10];
+		char str_temp_Hum[10];
+		char str_temp_P[10];
+		char str_temp_Vbat[10];
+		
+		
         ReadSensors();
         write2sd();
-        alarmTime = false;
+		
+
+					  
+		
+		dtostrf(t1, 3, 1, str_temp_t1);
+		dtostrf(humidity, 3, 1, str_temp_Hum);
+		dtostrf(pressurePascals, 6, 1, str_temp_P);
+		dtostrf(vbat, 4, 2, str_temp_Vbat);
+		snprintf(buf,256,"%2d.%2d.%2d|%2d:%2d:%2d|t1=%5s|Hum=%5s|P=%6s|Vbat=%4s|Cnt_1=%u|Cnt_2=%u\r\n",menuDate.date.day,menuDate.date.month,menuDate.date.year,\
+					menuTime.time.hour,menuTime.time.minute,menuTime.time.second,str_temp_t1,str_temp_Hum,str_temp_P,str_temp_Vbat,cntWriteSD_1,cntWriteSD_2);
+		//RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
+        RAK811_sendData(buf);
+		alarmTime = false;
     }
 
 
