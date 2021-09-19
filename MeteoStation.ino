@@ -40,16 +40,16 @@ float vbat = 0.0;            // calculated voltage
 
 const uint8_t t_deviceAddress[5][8] =
 {
-    { 0x28, 0xdb, 0x04, 0x75, 0xd0, 0x01, 0x3c, 0xd4 },//0
-    { 0x28, 0x4b, 0xeb, 0x07, 0xb6, 0x01, 0x3c, 0x0b },//1
-    { 0x28, 0x48, 0xdf, 0x07, 0xb6, 0x01, 0x3c, 0xc9 },//2
-    { 0x28, 0x87, 0x13, 0x7f, 0x12, 0x21, 0x01, 0x2f },//3
-    { 0x28, 0x17, 0x62, 0x80, 0x12, 0x21, 0x01, 0xd5 } //4
+  { 0x28, 0xdb, 0x04, 0x75, 0xd0, 0x01, 0x3c, 0xd4 },//0
+  { 0x28, 0x4b, 0xeb, 0x07, 0xb6, 0x01, 0x3c, 0x0b },//1
+  { 0x28, 0x48, 0xdf, 0x07, 0xb6, 0x01, 0x3c, 0xc9 },//2
+  { 0x28, 0x87, 0x13, 0x7f, 0x12, 0x21, 0x01, 0x2f },//3
+  { 0x28, 0x17, 0x62, 0x80, 0x12, 0x21, 0x01, 0xd5 } //4
 };
 
 const uint8_t* t1_deviceAddress = t_deviceAddress[4];
 const uint8_t* t2_deviceAddress = t_deviceAddress[2];
-const uint8_t* t3_deviceAddress = t_deviceAddress[0];
+const uint8_t* t3_deviceAddress = t_deviceAddress[3];
 
 //button addresses analogread()
 const int buttonDOWN = 372; //shitty
@@ -82,159 +82,159 @@ Nokia_LCD lcd(PIN_CLK_LCD /* CLK */, PIN_CLK_DIN /* DIN */, PIN_CLK_DC /* DC */,
 void setup()
 {
   //#ifdef DEBUG
-    Serial.begin(9600); // открываем последовательный порт для мониторинга действий в программе
+  Serial.begin(9600); // открываем последовательный порт для мониторинга действий в программе
   //#endif
-    Wire.begin();// Start the I2C interface
+  Wire.begin();// Start the I2C interface
 
-    lcd.begin(); //initialize screen
-    lcd.setBacklight(true);
-    lcd.setContrast(60);
-    lcd.clear(true);
-    delay(500);
-    lcd.clear();
-    lcd.setBacklight(false);
-    lcd.setCursor(0,5);
+  lcd.begin(); //initialize screen
+  lcd.setBacklight(true);
+  lcd.setContrast(60);
+  lcd.clear(true);
+  delay(500);
+  lcd.clear();
+  lcd.setBacklight(false);
+  lcd.setCursor(0, 5);
 
-    pinMode(PIN_INT_ALARM, INPUT);// пин для внешнего прерывания от RTC
-    pinMode(PIN_INT_BUTTON, INPUT);// пин для внешнего прерывания от button
-    pinMode(PIN_CS_SD_CARD_1, OUTPUT);
-    pinMode(PIN_CS_SD_CARD_2, OUTPUT);
-    pinMode(53, OUTPUT);
-    set_sleep_mode(SLEEP_MODE_PWR_DOWN); // настройка режима сна
+  pinMode(PIN_INT_ALARM, INPUT);// пин для внешнего прерывания от RTC
+  pinMode(PIN_INT_BUTTON, INPUT);// пин для внешнего прерывания от button
+  pinMode(PIN_CS_SD_CARD_1, OUTPUT);
+  pinMode(PIN_CS_SD_CARD_2, OUTPUT);
+  pinMode(53, OUTPUT);
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN); // настройка режима сна
 
-    sensors.begin();//датчики температуры
-	sensors.setResolution(t1_deviceAddress,12,true);
-	sensors.setResolution(t2_deviceAddress,12,true);
-	sensors.setResolution(t3_deviceAddress,12,true);
+  sensors.begin();//датчики температуры
+  sensors.setResolution(t1_deviceAddress, 12, true);
+  sensors.setResolution(t2_deviceAddress, 12, true);
+  sensors.setResolution(t3_deviceAddress, 12, true);
 
-    barometer.begin(Wire, LPS25HB_I2C_ADDR_ALT);
+  barometer.begin(Wire, LPS25HB_I2C_ADDR_ALT);
 
-    humidity_sensor.begin();
+  humidity_sensor.begin();
 
-    rtc.setSecond(BUILD_SEC);    // устанавливаем секунд
-    rtc.setMinute(BUILD_MIN);    // установка минут
-    rtc.setHour(BUILD_HOUR);     //установка часов
-    rtc.setDate(BUILD_DAY);     // устанавливаем число
-    rtc.setMonth(BUILD_MONTH);   // Устанавливаем месяц
-    rtc.setYear(BUILD_YEAR-2000);    // Устанавливаем год
-    rtc.setClockMode(false);    // установка режима 12/24h. True is 12-h, false is 24-hour.
+  rtc.setSecond(BUILD_SEC);    // устанавливаем секунд
+  rtc.setMinute(BUILD_MIN);    // установка минут
+  rtc.setHour(BUILD_HOUR);     //установка часов
+  rtc.setDate(BUILD_DAY);     // устанавливаем число
+  rtc.setMonth(BUILD_MONTH);   // Устанавливаем месяц
+  rtc.setYear(BUILD_YEAR - 2000);  // Устанавливаем год
+  rtc.setClockMode(false);    // установка режима 12/24h. True is 12-h, false is 24-hour.
 
-	timeCurrent = RTClib::now();  // чтение текущего времени
-  	menuDate.date.day = timeCurrent.day();
-  	menuDate.date.month = timeCurrent.month();
-  	menuDate.date.year =  timeCurrent.year()-2000;
+  timeCurrent = RTClib::now();  // чтение текущего времени
+  menuDate.date.day = timeCurrent.day();
+  menuDate.date.month = timeCurrent.month();
+  menuDate.date.year =  timeCurrent.year() - 2000;
 
-	menuAlarm.alarm.scale = MIN;
-	menuAlarm.alarm.period = 15;
+  menuAlarm.alarm.scale = MIN;
+  menuAlarm.alarm.period = 15;
 
 
-	SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
-	rtc.turnOnAlarm(1);
+  SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+  rtc.turnOnAlarm(1);
 
-    attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
-    attachInterrupt(INT_BUTTON,isrButtonPressed,FALLING); // прерывание от button
+  attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
+  attachInterrupt(INT_BUTTON, isrButtonPressed, FALLING); // прерывание от button
 
-    RAK811_init();
-    RAK811_confMode(RAK811_MODE_LORA_P2P);
-    delay(1000);
-    RAK811_confP2Pprm("869525000",12,0,1,8,20);
-    delay(1000);
-    RAK811_confTransferMode(RAK811_SENDER_MODE);
-    delay(1000);
-	ReadSensors();
-	pressAnyButton = true;
-/*
-  char testitoa[20] = {"test itoa"};
-  char testBuf[64];
-  char* pdata = testitoa;
-  int size = strlen(testitoa);
-  uint8_t temp=0;
-  char *p = testBuf;
-  
+  RAK811_init();
+  RAK811_confMode(RAK811_MODE_LORA_P2P);
+  delay(1000);
+  RAK811_confP2Pprm("869525000", 12, 0, 1, 8, 20);
+  delay(1000);
+  RAK811_confTransferMode(RAK811_SENDER_MODE);
+  delay(1000);
+  ReadSensors();
+  pressAnyButton = true;
+  /*
+    char testitoa[20] = {"test itoa"};
+    char testBuf[64];
+    char* pdata = testitoa;
+    int size = strlen(testitoa);
+    uint8_t temp=0;
+    char *p = testBuf;
 
-  for(int i=0;i<size;i++)
-  {
-      temp = (uint8_t)*pdata;
-      itoa(((temp&0xf0)>>4),p,16);
-      p++;
-      itoa((temp&0x0f),p,16);
-      pdata++;
-      p++;
-  }
-  Serial.print("testBuf =");
-  Serial.println(testBuf);
-  while(1);
+
+    for(int i=0;i<size;i++)
+    {
+        temp = (uint8_t)*pdata;
+        itoa(((temp&0xf0)>>4),p,16);
+        p++;
+        itoa((temp&0x0f),p,16);
+        pdata++;
+        p++;
+    }
+    Serial.print("testBuf =");
+    Serial.println(testBuf);
+    while(1);
   */
 }
 
 void loop()
 {
-    if (true == pressAnyButton)
+  if (true == pressAnyButton)
+  {
+    Serial.println("\r\npressAnyButton");
+    timeCurrent = RTClib::now();  // чтение текущего времени
+    //ReadSensors();
+    LCDShow();
+    pressAnyButton = false;
+    timeOld = timeCurrent;
+    timeDelay = millis();
+    timeDelayOld = timeDelay;
+    //RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
+
+  }
+
+  if (true == alarmTime)
+  {
+    char buf[256];
+    char str_temp_t1[10];
+    char str_temp_Hum[10];
+    char str_temp_P[10];
+    char str_temp_Vbat[10];
+
+
+    ReadSensors();
+    write2sd();
+
+
+
+
+    dtostrf(t1, 3, 1, str_temp_t1);
+    dtostrf(humidity, 3, 1, str_temp_Hum);
+    dtostrf(pressurePascals, 6, 1, str_temp_P);
+    dtostrf(vbat, 4, 2, str_temp_Vbat);
+    snprintf(buf, 256, "%2d.%2d.%2d|%2d:%2d:%2d|t1=%5s|Hum=%5s|P=%6s|Vbat=%4s|Cnt_1=%u|Cnt_2=%u", menuDate.date.day, menuDate.date.month, menuDate.date.year, \
+             menuTime.time.hour, menuTime.time.minute, menuTime.time.second, str_temp_t1, str_temp_Hum, str_temp_P, str_temp_Vbat, cntWriteSD_1, cntWriteSD_2);
+    //RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
+    RAK811_sendData(buf);
+    alarmTime = false;
+  }
+
+
+  if ((timeCurrent.unixtime() - timeOld.unixtime()) > TIME_SCREEN_ON)
+  {
+    SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+    rtc.checkIfAlarm(ALARM_1);// сбрасываем флаг ALARM_1
+    attachInterrupt(INT_ALARM, isrAlarm, FALLING); // прерывание от RTC
+    attachInterrupt(INT_BUTTON, isrButtonPressed, FALLING); // прерывание от button
+    lcd.clear();
+    lcd.setInverted(false);
+    lcd.setCursor(0, 2);
+    lcd.print("Sleep");
+    sleep_mode(); // Переводим МК в сон
+    lcd.clear();
+    lcd.print("Wakeup");
+  }
+  else
+  {
+    // читаем время RTC раз в секунду
+    timeDelay = millis();
+    if ((timeDelay - timeDelayOld) > 1000)
     {
-        Serial.println("\r\npressAnyButton");
-        timeCurrent = RTClib::now();  // чтение текущего времени
-		//ReadSensors();
-        LCDShow();
-        pressAnyButton = false;
-        timeOld = timeCurrent;
-        timeDelay = millis();
-        timeDelayOld = timeDelay;
-        //RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
-       
+      timeCurrent = RTClib::now();  // чтение текущего времени
+      timeDelayOld = timeDelay;
+
     }
-
-    if (true == alarmTime)
-    {
-		char buf[256];
-		char str_temp_t1[10];
-		char str_temp_Hum[10];
-		char str_temp_P[10];
-		char str_temp_Vbat[10];
-		
-		
-        ReadSensors();
-        write2sd();
-		
-
-					  
-		
-		dtostrf(t1, 3, 1, str_temp_t1);
-		dtostrf(humidity, 3, 1, str_temp_Hum);
-		dtostrf(pressurePascals, 6, 1, str_temp_P);
-		dtostrf(vbat, 4, 2, str_temp_Vbat);
-		snprintf(buf,256,"%2d.%2d.%2d|%2d:%2d:%2d|t1=%5s|Hum=%5s|P=%6s|Vbat=%4s|Cnt_1=%u|Cnt_2=%u",menuDate.date.day,menuDate.date.month,menuDate.date.year,\
-					menuTime.time.hour,menuTime.time.minute,menuTime.time.second,str_temp_t1,str_temp_Hum,str_temp_P,str_temp_Vbat,cntWriteSD_1,cntWriteSD_2);
-		//RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
-        RAK811_sendData(buf);
-		alarmTime = false;
-    }
-
-
-    if ((timeCurrent.unixtime() - timeOld.unixtime())>TIME_SCREEN_ON)
-    {
-        SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
-        rtc.checkIfAlarm(ALARM_1);// сбрасываем флаг ALARM_1
-        attachInterrupt(INT_ALARM,isrAlarm,FALLING);  // прерывание от RTC
-        attachInterrupt(INT_BUTTON,isrButtonPressed,FALLING); // прерывание от button
-        lcd.clear();
-		lcd.setInverted(false);
-        lcd.setCursor(0,2);
-        lcd.print("Sleep");
-        sleep_mode(); // Переводим МК в сон
-        lcd.clear();
-        lcd.print("Wakeup");
-    }
-    else
-    { 
-        // читаем время RTC раз в секунду
-        timeDelay = millis();
-        if ((timeDelay - timeDelayOld)>1000)
-        {
-            timeCurrent = RTClib::now();  // чтение текущего времени
-            timeDelayOld = timeDelay;
-
-        }
-    }
+  }
 
 
 }
@@ -257,19 +257,19 @@ void isrAlarm()
 /********************************обработчик прерывания по кнопке********************/
 void isrButtonPressed()
 {
- Serial.println("\r\nisr Button");
+  Serial.println("\r\nisr Button");
 
- //RAK811_sendMessage(RAK811_FirstPartStrToSend);
+  //RAK811_sendMessage(RAK811_FirstPartStrToSend);
 
- ADCSRA |= (1 << ADEN);
- buttonNum = whbuttonPressed();
- if (0 != buttonNum)
- {
-  pressAnyButton = true;
- }
- else
- {
-  ;
- }
+  ADCSRA |= (1 << ADEN);
+  buttonNum = whbuttonPressed();
+  if (0 != buttonNum)
+  {
+    pressAnyButton = true;
+  }
+  else
+  {
+    ;
+  }
 
 }

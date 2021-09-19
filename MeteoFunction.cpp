@@ -872,6 +872,10 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
         time.hour = menuTime.time.hour;
         time.minute = menuTime.time.minute;
         time.second = menuTime.time.second;
+
+        alarm.scale = menuAlarm.alarm.scale;
+        alarm.period = menuAlarm.alarm.period;
+
         makeStringsForLCD(&date,&time,&alarm);
 
 		lcd.clear();
