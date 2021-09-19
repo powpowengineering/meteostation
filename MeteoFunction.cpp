@@ -12,9 +12,9 @@
 #include "buildTime.h" // ?????? ???????????????? ???????????? ???????? ?? ??????????????, ???????????????????? ?????? ????????????????????
 #include <Nokia_LCD.h> //nokia 5110 display
 #include "Init.h"
-#include <math.h>				 
+#include <math.h>
 #include <TimeLib.h>
-#include <EEPROM.h>				  
+#include <EEPROM.h>
 
 
 //**************************************************************************************************
@@ -22,7 +22,7 @@
 //--------------------------------------------------------------------------------------------------
 // @Description   Has any button pressed?
 //--------------------------------------------------------------------------------------------------
-// @Notes         None.  
+// @Notes         None.
 //--------------------------------------------------------------------------------------------------
 // @ReturnValue   true  - button was pressed
 //                false - button wasn't pressed
@@ -42,7 +42,7 @@ bool anybuttonPressed(void)
 //--------------------------------------------------------------------------------------------------
 // @Description   What button was pressed?
 //--------------------------------------------------------------------------------------------------
-// @Notes         None.  
+// @Notes         None.
 //--------------------------------------------------------------------------------------------------
 // @ReturnValue   Number button
 //--------------------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ int whbuttonPressed(void)
 //--------------------------------------------------------------------------------------------------
 // @Description   Write data in two SD card
 //--------------------------------------------------------------------------------------------------
-// @Notes         None.  
+// @Notes         None.
 //--------------------------------------------------------------------------------------------------
 // @ReturnValue   None.
 //--------------------------------------------------------------------------------------------------
@@ -86,21 +86,21 @@ void write2sd(void)
     static uint32_t lt_day1=0;
     static String stringOne("d1.txt");
 	static String stringOne2("d1.txt");
-    uint32_t currentUnixTime;				   
+    uint32_t currentUnixTime;
 
   digitalWrite(PIN_CS_SD_CARD_1,HIGH);
   digitalWrite(PIN_CS_SD_CARD_2,HIGH);
-      
-	currentUnixTime = timeCurrent.unixtime();									  
+
+	currentUnixTime = timeCurrent.unixtime();
     #ifdef DEBUG
     Serial.print("Initializing SD card #1...");
     #endif
-    if (SD.begin(SPI_HALF_SPEED,PIN_CS_SD_CARD_1)) 
+    if (SD.begin(SPI_HALF_SPEED,PIN_CS_SD_CARD_1))
       {
         #ifdef DEBUG
             Serial.println("initialization done.");
         #endif
-      
+
         if ((reg>=10) || ((currentUnixTime-lt_day)>(uint32_t)(SECONDS_IN_DAY)))
         {
             stringOne = "d"+String(count)+".txt"; //or .csv?
@@ -112,20 +112,20 @@ void write2sd(void)
 
         myFile = SD.open(stringOne, FILE_WRITE);
         if (myFile)
-        { 
-            cntWriteSD_1++;  
+        {
+            cntWriteSD_1++;
             myFile.print(t1);
             myFile.print(" | ");
             myFile.print(t2);
             myFile.print(" | ");
             myFile.print(t3);
-            myFile.print(" | ");     
+            myFile.print(" | ");
             myFile.print(pressurePascals);
             myFile.print(" | ");
             myFile.print(humidity);
             myFile.print(" | ");
             myFile.print(vbat);
-            myFile.print(" | ");			   
+            myFile.print(" | ");
             myFile.print(timeCurrent.day());
             myFile.print(".");
             myFile.print(timeCurrent.month());
@@ -138,8 +138,8 @@ void write2sd(void)
             myFile.print(":");
             myFile.println(timeCurrent.second());
             myFile.close();
-        } 
-        else 
+        }
+        else
         {
           #ifdef DEBUG
           Serial.println("Could not open file on sd 1.");
@@ -160,7 +160,7 @@ void write2sd(void)
     #ifdef DEBUG
     Serial.print("Initializing SD card #2...");
     #endif
-    
+
     if ((reg2>=10) || ((currentUnixTime-lt_day1)>(uint32_t)(SECONDS_IN_DAY)))
     {
         stringOne2 = "d"+String(count2)+".txt"; //or .csv?
@@ -169,29 +169,29 @@ void write2sd(void)
         lt_day1 = currentUnixTime;
     }
     reg2=reg2+1;
-    
-    if (SD.begin(SPI_HALF_SPEED,PIN_CS_SD_CARD_2)) 
+
+    if (SD.begin(SPI_HALF_SPEED,PIN_CS_SD_CARD_2))
       {
         #ifdef DEBUG
           Serial.println("initialization done.");
         #endif
-      
+
          myFile = SD.open(stringOne2, FILE_WRITE);
         if (myFile)
-        {  
+        {
             cntWriteSD_2++;
             myFile.print(t1);
             myFile.print(" | ");
             myFile.print(t2);
             myFile.print(" | ");
             myFile.print(t3);
-            myFile.print(" | ");     
+            myFile.print(" | ");
             myFile.print(pressurePascals);
             myFile.print(" | ");
             myFile.print(humidity);
             myFile.print(" | ");
             myFile.print(vbat);
-            myFile.print(" | ");			   
+            myFile.print(" | ");
             myFile.print(timeCurrent.day());
             myFile.print(".");
             myFile.print(timeCurrent.month());
@@ -203,9 +203,9 @@ void write2sd(void)
             myFile.print(timeCurrent.minute());
             myFile.print(":");
             myFile.println(timeCurrent.second());
-            myFile.close(); 
-        } 
-        else 
+            myFile.close();
+        }
+        else
         {
           #ifdef DEBUG
           Serial.println("Could not open file on sd 2");
@@ -221,7 +221,7 @@ void write2sd(void)
       Serial.println(SD.card.errorCode());
       #endif
     }
-    SD.end();  
+    SD.end();
 }// end of write2sd()
 
 
@@ -231,7 +231,7 @@ void write2sd(void)
 //--------------------------------------------------------------------------------------------------
 // @Description   Show menu on LCD
 //--------------------------------------------------------------------------------------------------
-// @Notes         None.  
+// @Notes         None.
 //--------------------------------------------------------------------------------------------------
 // @ReturnValue   None.
 //--------------------------------------------------------------------------------------------------
@@ -240,7 +240,7 @@ void write2sd(void)
  void LCDShow(void)
 {
   static MENU_SCREEN menuLCD = MAIN_MENU;
-/*------------------------------ MAIN menu ----------------------------*/  
+/*------------------------------ MAIN menu ----------------------------*/
     if (MAIN_MENU == menuLCD)
     {
         if (BUTTON_DOWN == buttonNum)// down
@@ -249,7 +249,7 @@ void write2sd(void)
             {
                 if ((firstRowPos+(NUMBER_ROWS_SCREEN-1)) == cursorPos)
                 {
-                    firstRowPos +=1; 
+                    firstRowPos +=1;
                 }
                 cursorPos +=1;
             }
@@ -267,24 +267,24 @@ void write2sd(void)
             }
         else if (BUTTON_SELECT == buttonNum)// select
             {
-				lcd.setInverted(false);// ?????????? ???????????? ???????????????? ???????? ???????????? ??????????????????																										   
-                if (SCREEN_DATE_POS == cursorPos) 
+				lcd.setInverted(false);// ?????????? ???????????? ???????????????? ???????? ???????????? ??????????????????
+                if (SCREEN_DATE_POS == cursorPos)
                 {
                     menuLCD = DATE_MENU;
                     menuDate.state = DAY;
-                    
+
                 }
-                else if (SCREEN_TIME_POS == cursorPos) 
+                else if (SCREEN_TIME_POS == cursorPos)
                 {
                     menuLCD = TIME_MENU;
 					menuTime.state = HOUR;
-					            
+
                 }
                 else if (SCREEN_ALARM_POS == cursorPos)
                 {
                     menuLCD = ALARM_MENU;
                      //menuAlarm.state = SCALE; - commented because it was same in pasha's file
-                    //printCurrentMenuOnLCD(menuLCD);       
+                    //printCurrentMenuOnLCD(menuLCD);
                 }
 				else if ((SCREEN_TEMP1_POS == cursorPos)||(SCREEN_TEMP2_POS == cursorPos)||(SCREEN_TEMP3_POS == cursorPos)\
 						||(SCREEN_HUM_POS == cursorPos)||(SCREEN_PRES_POS == cursorPos)|| (SCREEN_VBAT_POS == cursorPos))
@@ -304,7 +304,7 @@ void write2sd(void)
                 if (menuDate.date.day > 1)
                 {
                     menuDate.date.day--;
-                }            
+                }
             }
             else if (MONTH == menuDate.state)
             {
@@ -325,14 +325,14 @@ void write2sd(void)
         {
             if (DAY == menuDate.state)
             {
-				menuDate.date.day++;				
+				menuDate.date.day++;
             }
             else if (MONTH == menuDate.state)
             {
                 if (menuDate.date.month < 12)
                 {
                     menuDate.date.month++;
-					
+
                 }
             }
             else if (YEAR == menuDate.state)
@@ -341,7 +341,7 @@ void write2sd(void)
                 {
                     menuDate.date.year++;
                 }
-            }           
+            }
         }
         else if (BUTTON_LEFT == buttonNum)// left
         {
@@ -371,7 +371,7 @@ void write2sd(void)
             else if (YEAR == menuDate.state)
             {
                 ;
-            }    
+            }
         }
         else if (BUTTON_SELECT == buttonNum)// select
         {
@@ -379,11 +379,11 @@ void write2sd(void)
             timeCurrent = RTClib::now();  // ???????????? ???????????????? ??????????????
             menuLCD = MAIN_MENU;
         }
-		
+
 		if(((menuDate.date.month == 1) || (menuDate.date.month == 3) || (menuDate.date.month == 5) || (menuDate.date.month == 7)\
 			|| (menuDate.date.month == 8) || (menuDate.date.month == 10) || (menuDate.date.month == 12)) && (menuDate.date.day > 31))
 		{
-			menuDate.date.day = 31; 
+			menuDate.date.day = 31;
 		}
 		else if(((menuDate.date.month == 4) || (menuDate.date.month == 6) || (menuDate.date.month == 9) || (menuDate.date.month == 11))
                     && (menuDate.date.day > 30))
@@ -394,8 +394,8 @@ void write2sd(void)
 		{
 			menuDate.date.day = 28;
 		}
-		
-		
+
+
         printCurrentMenuOnLCD(menuLCD);
     }
 /*------------------------------ TIME menu ----------------------------*/
@@ -412,7 +412,7 @@ void write2sd(void)
                 else
                 {
                     menuTime.time.hour--;
-                }                    
+                }
             }
             else if (MINUTE == menuTime.state)
             {
@@ -436,7 +436,7 @@ void write2sd(void)
                     menuTime.time.second--;
                 }
             }
-        }  
+        }
         else if (BUTTON_UP == buttonNum)// up
         {
             if (HOUR == menuTime.state)
@@ -448,7 +448,7 @@ void write2sd(void)
                 else
                 {
                     menuTime.time.hour++;
-                }                    
+                }
             }
             else if (MINUTE == menuTime.state)
             {
@@ -501,13 +501,13 @@ void write2sd(void)
             else if (SECOND == menuTime.state)
             {
                 ;
-            } 
+            }
         }
         else if (BUTTON_SELECT == buttonNum)// select
         {
             SetTime(menuTime.time.hour, menuTime.time.minute, menuTime.time.second);
             timeCurrent = RTClib::now();  // ???????????? ???????????????? ??????????????
-            menuLCD = MAIN_MENU; 
+            menuLCD = MAIN_MENU;
         }
         printCurrentMenuOnLCD(menuLCD);
     }
@@ -520,28 +520,36 @@ void write2sd(void)
           {
             if (menuAlarm.alarm.scale == SEC)
             {
-              menuAlarm.alarm.scale = MIN; 
+              menuAlarm.alarm.scale = MIN;
               menuAlarm.alarm.period = 10;
             }
             else if (menuAlarm.alarm.scale == MIN)
                 {
                   menuAlarm.alarm.scale = HOURS;
                   menuAlarm.alarm.period = 1;
-                } 
-                else 
+                }
+                else
                 {
                   menuAlarm.alarm.scale = HOURS;
                 }
           }
           else if (PERIOD == menuAlarm.state)
           {
-              if ((menuAlarm.alarm.scale == MIN) || (menuAlarm.alarm.scale == SEC))
+              if (menuAlarm.alarm.scale == SEC)
               {
                 if (menuAlarm.alarm.period > 10)
                 {
                   menuAlarm.alarm.period--;
                 }
                 else {menuAlarm.alarm.period=10;}
+              }
+              if (menuAlarm.alarm.scale == MIN)
+              {
+                if (menuAlarm.alarm.period > 1)
+                {
+                  menuAlarm.alarm.period--;
+                }
+                else {menuAlarm.alarm.period=1;}
 
               }
               else if (menuAlarm.alarm.period > 1)
@@ -555,7 +563,7 @@ void write2sd(void)
           {
             if (menuAlarm.alarm.scale == HOURS)
             {
-              menuAlarm.alarm.scale = MIN; 
+              menuAlarm.alarm.scale = MIN;
               menuAlarm.alarm.period = 10;
             }
             else if (menuAlarm.alarm.scale == MIN)
@@ -579,8 +587,8 @@ void write2sd(void)
                     menuAlarm.alarm.period++;
                   }
                   else {menuAlarm.alarm.period = 4;}
-         
-          }									  
+
+          }
   }
       else if (BUTTON_LEFT == buttonNum)// left
       {
@@ -617,7 +625,7 @@ void write2sd(void)
          SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
          menuLCD = MAIN_MENU;
       }
-      printCurrentMenuOnLCD(menuLCD);    
+      printCurrentMenuOnLCD(menuLCD);
     }
 }//end of LCDShow()
 
@@ -628,7 +636,7 @@ void write2sd(void)
 //--------------------------------------------------------------------------------------------------
 // @Description   Make strings for LCD's rows
 //--------------------------------------------------------------------------------------------------
-// @Notes         None.  
+// @Notes         None.
 //--------------------------------------------------------------------------------------------------
 // @ReturnValue   None.
 //--------------------------------------------------------------------------------------------------
@@ -637,7 +645,7 @@ void write2sd(void)
 void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
 {
     char str_temp[10];
-	char str_scale[6];				  
+	char str_scale[6];
 	dtostrf(t1, 3, 1, str_temp);
 	snprintf(screenValue[0],LCD_NUM_SYMBOL_IN_ROW,"t1    %5s^C",str_temp);
 	dtostrf(t2, 3, 1, str_temp);
@@ -652,7 +660,7 @@ void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
     snprintf(screenValue[5],LCD_NUM_SYMBOL_IN_ROW,"Vbat   %s V",str_temp);
 	snprintf(screenValue[6],LCD_NUM_SYMBOL_IN_ROW,"Date %2d.%2d.%2d",date->day,date->month,date->year);
 	snprintf(screenValue[7],LCD_NUM_SYMBOL_IN_ROW,"Time %2d:%2d:%2d",time->hour,time->minute,time->second);
-	if (alarm->scale == HOURS) 
+	if (alarm->scale == HOURS)
     {
         snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq HOURS %d",alarm->period);
     }
@@ -660,11 +668,11 @@ void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
     {
         snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq MIN   %d",alarm->period);
     }
-    else 
+    else
 	{
 		snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq SEC   %d",alarm->period);
 	}
-	
+
 	snprintf(screenValue[9],LCD_NUM_SYMBOL_IN_ROW,"Cnt_1  %u",cntWriteSD_1);
     snprintf(screenValue[10],LCD_NUM_SYMBOL_IN_ROW,"Cnt_2  %u",cntWriteSD_2);
 
@@ -675,7 +683,7 @@ void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
 //--------------------------------------------------------------------------------------------------
 // @Description   read all sensors
 //--------------------------------------------------------------------------------------------------
-// @Notes         None.  
+// @Notes         None.
 //--------------------------------------------------------------------------------------------------
 // @ReturnValue   None.
 //--------------------------------------------------------------------------------------------------
@@ -686,7 +694,7 @@ void ReadSensors(void)
     timeCurrent = RTClib::now();  // ???????????? ???????????????? ??????????????
     pressurePascals = barometer.getPressure_hPa();
     humidity = humidity_sensor.readHumidity();
-    vbat = ReadVbat();			
+    vbat = ReadVbat();
 
 	// ???????? ???????????? t1 ?????????????????????? ?????????????????? ??????????????????????
 	if (true == sensors.requestTemperaturesByAddress(t1_deviceAddress))
@@ -695,7 +703,7 @@ void ReadSensors(void)
 	}
 	else
 	{
-	  t1 = NAN;  
+	  t1 = NAN;
 	}
     // ???????? ???????????? t2 ?????????????????????? ?????????????????? ??????????????????????
 	if (true == sensors.requestTemperaturesByAddress(t2_deviceAddress))
@@ -704,7 +712,7 @@ void ReadSensors(void)
 	}
 	else
 	{
-	  t2 = NAN;  
+	  t2 = NAN;
 	}
     // ???????? ???????????? t3 ?????????????????????? ?????????????????? ??????????????????????
 	if (true == sensors.requestTemperaturesByAddress(t3_deviceAddress))
@@ -713,9 +721,9 @@ void ReadSensors(void)
 	}
 	else
 	{
-	  t3 = NAN;  
-	} 
-	
+	  t3 = NAN;
+	}
+
 	/**************************print debug*******************************/
 
     #ifdef DEBUG
@@ -729,19 +737,19 @@ void ReadSensors(void)
     Serial.print(":");
     Serial.print(timeCurrent.minute());
     Serial.print(":");
-    Serial.print(timeCurrent.second()); 
-	
+    Serial.print(timeCurrent.second());
+
 	  Serial.print(" ");
     Serial.print("Sensor t1:");
     Serial.print(t1);
     Serial.print((char)176);//shows degrees character
     Serial.print("C  |  ");
-		
+
     Serial.print("Sensor t2:");
     Serial.print(t2);
     Serial.print((char)176);//shows degrees character
     Serial.print("C  |  ");
-    
+
     Serial.print("Sensor t3:");
     Serial.print(t3);
     Serial.print((char)176);//shows degrees character
@@ -749,13 +757,13 @@ void ReadSensors(void)
 
     Serial.print("Pressure_P: ");
     Serial.print(pressurePascals);
-    Serial.println("Pa  ");     
-	  
-	
+    Serial.println("Pa  ");
+
+
     Serial.print("Humidity: ");
     Serial.print(humidity);
-    Serial.println("%  ");  
-	
+    Serial.println("%  ");
+
     #endif
 
 }// end of ReadSensors()
@@ -766,7 +774,7 @@ void ReadSensors(void)
 //--------------------------------------------------------------------------------------------------
 // @Description   print cuurent menu on LCD
 //--------------------------------------------------------------------------------------------------
-// @Notes         None.  
+// @Notes         None.
 //--------------------------------------------------------------------------------------------------
 // @ReturnValue   None.
 //--------------------------------------------------------------------------------------------------
@@ -777,16 +785,16 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
     DATE date;
     TIME time;
     ALARM alarm;
-    
+
     if ( MAIN_MENU == menuLCD )
-    { 
+    {
         menuDate.date.day = timeCurrent.day();
         menuDate.date.month = timeCurrent.month();
         menuDate.date.year = timeCurrent.year()-2000;
 		menuTime.time.hour = timeCurrent.hour();
         menuTime.time.minute = timeCurrent.minute();
         menuTime.time.second = timeCurrent.second();
-		
+
 		date.day = timeCurrent.day();
         date.month = timeCurrent.month();
         date.year = timeCurrent.year()-2000;
@@ -796,22 +804,22 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
 
         alarm.scale = menuAlarm.alarm.scale;
         alarm.period = menuAlarm.alarm.period;
-        
+
         makeStringsForLCD(&date,&time,&alarm);
-        
+
         lcd.clear();
         for (byte i=0;i< NUMBER_ROWS_SCREEN;i++)
         {
            lcd.setCursor(0,i);
-           if (i == (cursorPos-firstRowPos)) 
+           if (i == (cursorPos-firstRowPos))
            {
-                lcd.setInverted(true);	
+                lcd.setInverted(true);
            }
            else
            {
                lcd.setInverted(false);
-           }				   
-           lcd.print(screenValue[firstRowPos + i]);  
+           }
+           lcd.print(screenValue[firstRowPos + i]);
         }
     }
     else if ( DATE_MENU == menuLCD )
@@ -825,9 +833,9 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
 
         alarm.scale = menuAlarm.alarm.scale;
         alarm.period = menuAlarm.alarm.period;
-		
+
         makeStringsForLCD(&date,&time,&alarm);
-        
+
         lcd.clear();
         for (byte i=0;i< NUMBER_ROWS_SCREEN;i++)
         {
@@ -847,13 +855,13 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
 				{
 					lcd.print(screenValue[firstRowPos + i], 11, 2);
 				}
-				
+
 			}
 			else
 			{
-				lcd.print(screenValue[firstRowPos + i]); 
+				lcd.print(screenValue[firstRowPos + i]);
 			}
-				
+
         }
     }
     else if ( TIME_MENU == menuLCD )
@@ -865,7 +873,7 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
         time.minute = menuTime.time.minute;
         time.second = menuTime.time.second;
         makeStringsForLCD(&date,&time,&alarm);
-		
+
 		lcd.clear();
         for (byte i=0;i< NUMBER_ROWS_SCREEN;i++)
         {
@@ -884,12 +892,12 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
 				{
 					lcd.print(screenValue[firstRowPos + i], 11, 2);
 				}
-				
+
 			}
 			else
 			{
-				lcd.print(screenValue[firstRowPos + i]); 
-			}	
+				lcd.print(screenValue[firstRowPos + i]);
+			}
         }
     }
     else if ( ALARM_MENU == menuLCD )
@@ -903,15 +911,15 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
         alarm.scale = menuAlarm.alarm.scale;
         alarm.period = menuAlarm.alarm.period;
         makeStringsForLCD(&date,&time,&alarm);
-       
-    
+
+
         lcd.clear();
         for (byte i=0;i< NUMBER_ROWS_SCREEN;i++)
         {
             lcd.setCursor(0,i);
             if (i == (SCREEN_ALARM_POS-firstRowPos))
             {
-              
+
               if ( SCALE == menuAlarm.state )
               {
                 lcd.print(screenValue[firstRowPos + i], 5, 5);
@@ -919,16 +927,16 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
               else if ( PERIOD == menuAlarm.state )
                   {
                     lcd.print(screenValue[firstRowPos + i], 11, 2);
-                  }							 
-        
+                  }
+
     }
 	else
             {
-              lcd.print(screenValue[firstRowPos + i]); 
-            } 
+              lcd.print(screenValue[firstRowPos + i]);
+            }
         }
-    }			
-        
+    }
+
 }
 
 
@@ -938,19 +946,19 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
 //--------------------------------------------------------------------------------------------------
 // @Description   Set date in RTC
 //--------------------------------------------------------------------------------------------------
-// @Notes         None.  
+// @Notes         None.
 //--------------------------------------------------------------------------------------------------
 // @ReturnValue   None.
 //--------------------------------------------------------------------------------------------------
 // @Parameters    d -> day,
 //                m -> month
-//                yOff -> year, only last two digits              
+//                yOff -> year, only last two digits
 //**************************************************************************************************
 void SetDate(uint8_t  d , uint8_t  m, uint8_t yOff )
 {
     rtc.setDate(d);     // ?????????????????????????? ??????????
     rtc.setMonth(m);   // ?????????????????????????? ??????????
-    rtc.setYear(yOff);    // ?????????????????????????? ??????    
+    rtc.setYear(yOff);    // ?????????????????????????? ??????
 }// end of SetDate()
 
 
@@ -960,7 +968,7 @@ void SetDate(uint8_t  d , uint8_t  m, uint8_t yOff )
 //--------------------------------------------------------------------------------------------------
 // @Description   Set time in RTC
 //--------------------------------------------------------------------------------------------------
-// @Notes         None.  
+// @Notes         None.
 //--------------------------------------------------------------------------------------------------
 // @ReturnValue   None.
 //--------------------------------------------------------------------------------------------------
@@ -972,7 +980,7 @@ void SetTime(uint8_t  h, uint8_t  m, uint8_t s)
 {
     rtc.setSecond(s);        // ?????????????????????????? ??????????????
     rtc.setMinute(m);        // ?????????????????????????? ????????????
-    rtc.setHour(h);          // ?????????????????????????? ????????    
+    rtc.setHour(h);          // ?????????????????????????? ????????
 }// end of SetTime()
 
 //**************************************************************************************************
@@ -1049,13 +1057,13 @@ void SetAlarm(SCALE_enum  s, uint8_t  p)
           }
           else {nextTimeAlarm = unix_time+p*3600;}
 
-    al_days = day(nextTimeAlarm);   
+    al_days = day(nextTimeAlarm);
     al_hours = hour(nextTimeAlarm);
     al_minutes = minute(nextTimeAlarm);
     al_seconds = second(nextTimeAlarm);
 
 
-    /*sprintf(buf, "%02d:%02d:%02d %02d/%02d/%02d",  timeCurrent.hour(), timeCurrent.minute(), timeCurrent.second(), timeCurrent.day(), timeCurrent.month(), timeCurrent.year()); 
+    /*sprintf(buf, "%02d:%02d:%02d %02d/%02d/%02d",  timeCurrent.hour(), timeCurrent.minute(), timeCurrent.second(), timeCurrent.day(), timeCurrent.month(), timeCurrent.year());
     Serial.println(buf);
     Serial.println(timeCurrent.unixtime());
     Serial.println(nextTimeAlarm);
@@ -1067,4 +1075,4 @@ void SetAlarm(SCALE_enum  s, uint8_t  p)
     Serial.println(al_hours);
     Serial.println(al_minutes);
     rtc.setA1Time(al_days,al_hours,al_minutes,al_seconds,0x0, false, false, false);
-}// end of SetAlarm()																									
+}// end of SetAlarm()
