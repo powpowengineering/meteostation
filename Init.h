@@ -9,8 +9,9 @@
 #define INT_BUTTON        5// arduino pin 18, real int = int3
 
 #define ALARM_1           1
+#define ALARM_2           2
 #define NUMBER_ROWS_SCREEN        (6)
-#define NUMBER_SHOW_PARAM         (11)
+
 #define BUTTON_PIN                (A0)
 #define VBAT_PIN                  (A1)
 
@@ -28,17 +29,22 @@
 #define PIN_CLK_RST              (36)
 
 #define LCD_NUMBER_PIXELS_WIDE_SYMBOL   (5)
+
+#define NUMBER_SHOW_PARAM               (11)
+
 #define SCREEN_TEMP1_POS                (0)
 #define SCREEN_TEMP2_POS                (1)
 #define SCREEN_TEMP3_POS                (2)
 #define SCREEN_HUM_POS                  (3)
 #define SCREEN_PRES_POS                	(4)
-#define SCREEN_VBAT_POS                  (5)
+#define SCREEN_VBAT_POS                 (5)
 #define SCREEN_DATE_POS                 (6)
 #define SCREEN_TIME_POS                 (7)
 #define SCREEN_ALARM_POS                (8)
-#define SCREEN_CNT1_POS                 (9)
-#define SCREEN_CNT2_POS                 (10)
+#define SCREEN_ALARM_GSM_POS            (9)
+#define SCREEN_CNT1_POS                 (10)
+#define SCREEN_CNT2_POS                 (11)
+
 #define LCD_NUM_SYMBOL_IN_ROW			(14)
 #define SCREEN_DATE_DAY_POS             ((LCD_NUMBER_PIXELS_WIDE_SYMBOL * 7)-1)
 #define SCREEN_DATE_MONTH_POS           ((LCD_NUMBER_PIXELS_WIDE_SYMBOL * 11)-1)
@@ -56,7 +62,8 @@ typedef enum MENU_SCREEN_enum
     MAIN_MENU=0,
     DATE_MENU,
     TIME_MENU,
-    ALARM_MENU
+    ALARM_MENU,
+    ALARM_GSM_MENU
 }MENU_SCREEN;
 
 typedef enum DATE_MENU_STATE_SCREEN_enum
@@ -127,7 +134,9 @@ typedef struct ALARM_MENU_SCREEN_str
 extern DATE_MENU_SCREEN menuDate;
 extern TIME_MENU_SCREEN menuTime;
 extern ALARM_MENU_SCREEN menuAlarm;
+extern ALARM_MENU_SCREEN menuAlarmGSM;
 extern bool alarmTime;
+extern bool alarmTimeGSM ;
 extern byte buttonNum;
 extern bool pressAnyButton;
 extern char screenValue[NUMBER_SHOW_PARAM][LCD_NUM_SYMBOL_IN_ROW];
@@ -167,10 +176,11 @@ extern uint32_t cntWriteSD_2;
 extern int whbuttonPressed(void);
 extern void write2sd(void);
 extern void LCDShow(void);
-extern void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm);
+extern void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm, ALARM *alarmGSM);
 extern void ReadSensors(void);
 extern void printCurrentMenuOnLCD(MENU_SCREEN menuLCD);
 extern void SetDate(uint8_t  d , uint8_t  m, uint8_t yOff );
 extern void SetTime(uint8_t  h, uint8_t  m, uint8_t s);
 extern float ReadVbat(void);
 extern void SetAlarm(SCALE_enum  s, uint8_t  p);
+extern void SetAlarm2(SCALE_enum  s, uint8_t  p);

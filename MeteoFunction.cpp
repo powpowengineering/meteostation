@@ -286,6 +286,10 @@ void write2sd(void)
                      //menuAlarm.state = SCALE; - commented because it was same in pasha's file
                     //printCurrentMenuOnLCD(menuLCD);
                 }
+                else if (SCREEN_ALARM_GSM_POS == cursorPos)
+                {
+                    menuLCD = ALARM_GSM_MENU;
+                }
 				else if ((SCREEN_TEMP1_POS == cursorPos)||(SCREEN_TEMP2_POS == cursorPos)||(SCREEN_TEMP3_POS == cursorPos)\
 						||(SCREEN_HUM_POS == cursorPos)||(SCREEN_PRES_POS == cursorPos)|| (SCREEN_VBAT_POS == cursorPos))
 				{
@@ -521,7 +525,7 @@ void write2sd(void)
             if (menuAlarm.alarm.scale == SEC)
             {
               menuAlarm.alarm.scale = MIN;
-              menuAlarm.alarm.period = 10;
+              menuAlarm.alarm.period = 1;
             }
             else if (menuAlarm.alarm.scale == MIN)
                 {
@@ -589,7 +593,7 @@ void write2sd(void)
                   else {menuAlarm.alarm.period = 4;}
 
           }
-  }
+      }
       else if (BUTTON_LEFT == buttonNum)// left
       {
           if (SCALE == menuAlarm.state)
@@ -614,15 +618,110 @@ void write2sd(void)
       }
       else if (BUTTON_SELECT == buttonNum)// select
       {
-         Serial.println("test");
-         Serial.print("state in func lcd show menu alarm button select ");
-         Serial.println(menuAlarm.state);
-         Serial.print("period in func lcd show menu alram button select ");
-         Serial.println(menuAlarm.alarm.period);
-         Serial.print("period from alarm.period in func lacd show menu alarm buton selct");
-         Serial.println(menuAlarm.alarm.scale);
-        // Serial.println(alarm.period);
          SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+         menuLCD = MAIN_MENU;
+      }
+      printCurrentMenuOnLCD(menuLCD);
+    }
+/*--------------------------- ALARM GSM menu ------------------------*/
+    else if (ALARM_MENU == menuLCD)
+    {
+	if (BUTTON_DOWN == buttonNum)// down
+      {
+          if (SCALE == menuAlarmGSM.state)
+          {
+                if (menuAlarmGSM.alarm.scale == MIN)
+                {
+                  menuAlarmGSM.alarm.scale = HOURS;
+                  menuAlarmGSM.alarm.period = 1;
+                }
+                else if (menuAlarmGSM.alarm.scale == HOUR)
+                {
+                  menuAlarmGSM.alarm.scale = MIN;
+                  menuAlarmGSM.alarm.period = 5; 
+                }
+          }
+          else if (PERIOD == menuAlarmGSM.state)
+          {
+              if (menuAlarmGSM.alarm.scale == MIN)
+              {
+                if (menuAlarmGSM.alarm.period > 5)
+                {
+                    menuAlarmGSM.alarm.period--;
+                }
+                else 
+                {
+                    menuAlarmGSM.alarm.period = 5;
+                }
+              }
+              else if (menuAlarmGSM.alarm.period > 1)
+              {
+                  menuAlarmGSM.alarm.period--;
+              }
+              else 
+              {
+                  menuAlarmGSM.alarm.period = 1;
+              }
+          }
+      }
+      else if (BUTTON_UP == buttonNum)// up
+      {
+          if (SCALE == menuAlarmGSM.state)
+          {
+                if (menuAlarmGSM.alarm.scale == HOURS)
+                {
+                    menuAlarmGSM.alarm.scale = MIN;
+                    menuAlarmGSM.alarm.period = 5;
+                }
+                else if (menuAlarmGSM.alarm.scale == MIN)
+                {
+                    menuAlarmGSM.alarm.scale = HOURS;
+                    menuAlarmGSM.alarm.period = 1;
+                } 
+          }
+          else if (PERIOD == menuAlarmGSM.state)
+          {
+              if (menuAlarmGSM.alarm.scale == MIN)
+              {
+                if (menuAlarmGSM.alarm.period<60)
+                {
+                  menuAlarmGSM.alarm.period++;
+                }
+                else {menuAlarmGSM.alarm.period = 5;}
+              }
+              else if (menuAlarmGSM.alarm.period<24)
+                  {
+                    menuAlarmGSM.alarm.period++;
+                  }
+                  else {menuAlarmGSM.alarm.period = 24;}
+
+          }
+      }
+      else if (BUTTON_LEFT == buttonNum)// left
+      {
+          if (SCALE == menuAlarmGSM.state)
+          {
+             ;
+          }
+          else if (PERIOD == menuAlarmGSM.state)
+          {
+              menuAlarmGSM.state = SCALE;
+          }
+      }
+      else if (BUTTON_RIGHT == buttonNum)// right
+      {
+          if (SCALE == menuAlarmGSM.state)
+          {
+              menuAlarmGSM.state = PERIOD;
+          }
+          else if (PERIOD == menuAlarmGSM.state)
+          {
+             ;
+          }
+      }
+      else if (BUTTON_SELECT == buttonNum)// select
+      {
+         SetAlarm(menuAlarmGSM.alarm.scale, menuAlarmGSM.alarm.period);
          menuLCD = MAIN_MENU;
       }
       printCurrentMenuOnLCD(menuLCD);
@@ -642,7 +741,7 @@ void write2sd(void)
 //--------------------------------------------------------------------------------------------------
 // @Parameters   date,time,alarm -> parameters, which we need to show
 //**************************************************************************************************
-void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
+void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm, ALARM *alarmGSM)
 {
     char str_temp[10];
 	char str_scale[6];
@@ -672,9 +771,19 @@ void makeStringsForLCD(DATE *date, TIME *time, ALARM *alarm)
 	{
 		snprintf(screenValue[8],LCD_NUM_SYMBOL_IN_ROW,"Freq SEC   %d",alarm->period);
 	}
+    
+    if (alarmGSM->scale == HOURS)
+    {
+        snprintf(screenValue[9],LCD_NUM_SYMBOL_IN_ROW,"FGSM HOURS %d",alarmGSM->period);
+    }
+    else if (alarmGSM->scale == MIN)
+    {
+        snprintf(screenValue[9],LCD_NUM_SYMBOL_IN_ROW,"FGSM MIN   %d",alarmGSM->period);
+    }
 
-	snprintf(screenValue[9],LCD_NUM_SYMBOL_IN_ROW,"Cnt_1  %u",cntWriteSD_1);
-    snprintf(screenValue[10],LCD_NUM_SYMBOL_IN_ROW,"Cnt_2  %u",cntWriteSD_2);
+
+	snprintf(screenValue[10],LCD_NUM_SYMBOL_IN_ROW,"Cnt_1  %u",cntWriteSD_1);
+    snprintf(screenValue[11],LCD_NUM_SYMBOL_IN_ROW,"Cnt_2  %u",cntWriteSD_2);
 
 }// end of makeStringsForLCD()
 
@@ -785,6 +894,7 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
     DATE date;
     TIME time;
     ALARM alarm;
+    ALARM alarmGSM;
 
     if ( MAIN_MENU == menuLCD )
     {
@@ -801,11 +911,11 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
         time.hour = timeCurrent.hour();
         time.minute = timeCurrent.minute();
         time.second = timeCurrent.second();
-
         alarm.scale = menuAlarm.alarm.scale;
         alarm.period = menuAlarm.alarm.period;
-
-        makeStringsForLCD(&date,&time,&alarm);
+        alarmGSM.scale = menuAlarmGSM.alarm.scale;
+        alarmGSM.period = menuAlarmGSM.alarm.period;
+        makeStringsForLCD(&date,&time,&alarm,&alarmGSM);
 
         lcd.clear();
         for (byte i=0;i< NUMBER_ROWS_SCREEN;i++)
@@ -830,11 +940,11 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
         time.hour = timeCurrent.hour();
         time.minute = timeCurrent.minute();
         time.second = timeCurrent.second();
-
         alarm.scale = menuAlarm.alarm.scale;
         alarm.period = menuAlarm.alarm.period;
-
-        makeStringsForLCD(&date,&time,&alarm);
+        alarmGSM.scale = menuAlarmGSM.alarm.scale;
+        alarmGSM.period = menuAlarmGSM.alarm.period;
+        makeStringsForLCD(&date,&time,&alarm,&alarmGSM);
 
         lcd.clear();
         for (byte i=0;i< NUMBER_ROWS_SCREEN;i++)
@@ -872,11 +982,11 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
         time.hour = menuTime.time.hour;
         time.minute = menuTime.time.minute;
         time.second = menuTime.time.second;
-
         alarm.scale = menuAlarm.alarm.scale;
         alarm.period = menuAlarm.alarm.period;
-
-        makeStringsForLCD(&date,&time,&alarm);
+        alarmGSM.scale = menuAlarmGSM.alarm.scale;
+        alarmGSM.period = menuAlarmGSM.alarm.period;
+        makeStringsForLCD(&date,&time,&alarm,&alarmGSM);
 
 		lcd.clear();
         for (byte i=0;i< NUMBER_ROWS_SCREEN;i++)
@@ -914,8 +1024,9 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
         time.second = timeCurrent.second();
         alarm.scale = menuAlarm.alarm.scale;
         alarm.period = menuAlarm.alarm.period;
-        makeStringsForLCD(&date,&time,&alarm);
-
+        alarmGSM.scale = menuAlarmGSM.alarm.scale;
+        alarmGSM.period = menuAlarmGSM.alarm.period;
+        makeStringsForLCD(&date,&time,&alarm,&alarmGSM);
 
         lcd.clear();
         for (byte i=0;i< NUMBER_ROWS_SCREEN;i++)
@@ -923,20 +1034,53 @@ void printCurrentMenuOnLCD(MENU_SCREEN menuLCD)
             lcd.setCursor(0,i);
             if (i == (SCREEN_ALARM_POS-firstRowPos))
             {
-
-              if ( SCALE == menuAlarm.state )
-              {
-                lcd.print(screenValue[firstRowPos + i], 5, 5);
-              }
-              else if ( PERIOD == menuAlarm.state )
-                  {
+                if ( SCALE == menuAlarm.state )
+                {
+                    lcd.print(screenValue[firstRowPos + i], 5, 5);
+                }
+                else if ( PERIOD == menuAlarm.state )
+                {
                     lcd.print(screenValue[firstRowPos + i], 11, 2);
-                  }
-
-    }
-	else
+                }
+            }
+            else
             {
-              lcd.print(screenValue[firstRowPos + i]);
+                lcd.print(screenValue[firstRowPos + i]);
+            }
+        }
+    }
+    else if ( ALARM_GSM_MENU == menuLCD )
+    {
+		date.day = timeCurrent.day();
+        date.month = timeCurrent.month();
+        date.year = timeCurrent.year()-2000;
+        time.hour = timeCurrent.hour();
+        time.minute = timeCurrent.minute();
+        time.second = timeCurrent.second();
+        alarm.scale = menuAlarm.alarm.scale;
+        alarm.period = menuAlarm.alarm.period;
+        alarmGSM.scale = menuAlarmGSM.alarm.scale;
+        alarmGSM.period = menuAlarmGSM.alarm.period;
+        makeStringsForLCD(&date,&time,&alarm,&alarmGSM);
+
+        lcd.clear();
+        for (byte i=0;i< NUMBER_ROWS_SCREEN;i++)
+        {
+            lcd.setCursor(0,i);
+            if (i == (SCREEN_ALARM_GSM_POS-firstRowPos))
+            {
+                if ( SCALE == menuAlarmGSM.state )
+                {
+                    lcd.print(screenValue[firstRowPos + i], 5, 5);
+                }
+                else if ( PERIOD == menuAlarmGSM.state )
+                {
+                    lcd.print(screenValue[firstRowPos + i], 11, 2);
+                }
+            }
+            else
+            {
+                lcd.print(screenValue[firstRowPos + i]);
             }
         }
     }
@@ -1024,6 +1168,8 @@ float ReadVbat(void)
       sum = 0;
 }//end of ReadVbat
 
+
+
 //**************************************************************************************************
 // @Function      SetAlarm()
 //--------------------------------------------------------------------------------------------------
@@ -1065,18 +1211,50 @@ void SetAlarm(SCALE_enum  s, uint8_t  p)
     al_hours = hour(nextTimeAlarm);
     al_minutes = minute(nextTimeAlarm);
     al_seconds = second(nextTimeAlarm);
-
-
-    /*sprintf(buf, "%02d:%02d:%02d %02d/%02d/%02d",  timeCurrent.hour(), timeCurrent.minute(), timeCurrent.second(), timeCurrent.day(), timeCurrent.month(), timeCurrent.year());
-    Serial.println(buf);
-    Serial.println(timeCurrent.unixtime());
-    Serial.println(nextTimeAlarm);
-*/
-    //setA1Time(byte A1Day, byte A1Hour, byte A1Minute, byte A1Second, byte AlarmBits, bool A1Dy, bool A1h12, bool A1PM)
-    Serial.println(unix_time);
-    Serial.println(nextTimeAlarm);
-    Serial.println(al_days);
-    Serial.println(al_hours);
-    Serial.println(al_minutes);
+    
     rtc.setA1Time(al_days,al_hours,al_minutes,al_seconds,0x0, false, false, false);
 }// end of SetAlarm()
+
+
+
+//**************************************************************************************************
+// @Function      SetAlarm2()
+//--------------------------------------------------------------------------------------------------
+// @Description   Set alarm 2
+//--------------------------------------------------------------------------------------------------
+// @Notes         None.
+//--------------------------------------------------------------------------------------------------
+// @ReturnValue   None.
+//--------------------------------------------------------------------------------------------------
+// @Parameters    s -> scale (hour/minute)
+//                p -> period (1-24 hours/ 1-60 minutes)
+//                t -> current time
+//**************************************************************************************************
+void SetAlarm2(SCALE_enum  s, uint8_t  p)
+{
+    DateTime timeCurrent;
+    char buf[20];
+    timeCurrent = RTClib::now();
+    uint32_t nextTimeAlarm;
+    int al_days;
+    int al_hours;
+    int al_minutes;
+    uint32_t unix_time;
+
+    unix_time = timeCurrent.unixtime();
+
+    if (s == MIN)
+    {
+        nextTimeAlarm = unix_time + p*60;
+    }
+    else 
+    {
+        nextTimeAlarm = unix_time + p*3600;
+    }
+
+    al_days = day(nextTimeAlarm);
+    al_hours = hour(nextTimeAlarm);
+    al_minutes = minute(nextTimeAlarm);
+
+    rtc.setA2Time(al_days, al_hours, al_minutes, 0x0, false, false, false);
+}// end of SetAlarm2()

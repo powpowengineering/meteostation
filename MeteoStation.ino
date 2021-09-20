@@ -21,8 +21,10 @@
 DATE_MENU_SCREEN menuDate;
 TIME_MENU_SCREEN menuTime;
 ALARM_MENU_SCREEN menuAlarm;
+ALARM_MENU_SCREEN menuAlarmGSM;
 
 bool alarmTime = false;
+bool alarmTimeGSM = false;
 byte buttonNum = 0;     // какая кнопка нажата
 bool pressAnyButton = false; // была ли нажата кнопка любая
 char screenValue[NUMBER_SHOW_PARAM][LCD_NUM_SYMBOL_IN_ROW];
@@ -133,108 +135,100 @@ void setup()
 
   attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
   attachInterrupt(INT_BUTTON, isrButtonPressed, FALLING); // прерывание от button
-
-  RAK811_init();
-  RAK811_confMode(RAK811_MODE_LORA_P2P);
-  delay(1000);
-  RAK811_confP2Pprm("869525000", 12, 0, 1, 8, 20);
-  delay(1000);
-  RAK811_confTransferMode(RAK811_SENDER_MODE);
-  delay(1000);
+  
   ReadSensors();
   pressAnyButton = true;
-  /*
-    char testitoa[20] = {"test itoa"};
-    char testBuf[64];
-    char* pdata = testitoa;
-    int size = strlen(testitoa);
-    uint8_t temp=0;
-    char *p = testBuf;
 
-
-    for(int i=0;i<size;i++)
-    {
-        temp = (uint8_t)*pdata;
-        itoa(((temp&0xf0)>>4),p,16);
-        p++;
-        itoa((temp&0x0f),p,16);
-        pdata++;
-        p++;
-    }
-    Serial.print("testBuf =");
-    Serial.println(testBuf);
-    while(1);
-  */
 }
 
 void loop()
 {
-  if (true == pressAnyButton)
-  {
-    Serial.println("\r\npressAnyButton");
-    timeCurrent = RTClib::now();  // чтение текущего времени
-    //ReadSensors();
-    LCDShow();
-    pressAnyButton = false;
-    timeOld = timeCurrent;
-    timeDelay = millis();
-    timeDelayOld = timeDelay;
-    //RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
-
-  }
-
-  if (true == alarmTime)
-  {
-    char buf[256];
-    char str_temp_t1[10];
-    char str_temp_Hum[10];
-    char str_temp_P[10];
-    char str_temp_Vbat[10];
-
-
-    ReadSensors();
-    write2sd();
-
-
-
-
-    dtostrf(t1, 3, 1, str_temp_t1);
-    dtostrf(humidity, 3, 1, str_temp_Hum);
-    dtostrf(pressurePascals, 6, 1, str_temp_P);
-    dtostrf(vbat, 4, 2, str_temp_Vbat);
-    snprintf(buf, 256, "%2d.%2d.%2d|%2d:%2d:%2d|t1=%5s|Hum=%5s|P=%6s|Vbat=%4s|Cnt_1=%u|Cnt_2=%u", menuDate.date.day, menuDate.date.month, menuDate.date.year, \
-             menuTime.time.hour, menuTime.time.minute, menuTime.time.second, str_temp_t1, str_temp_Hum, str_temp_P, str_temp_Vbat, cntWriteSD_1, cntWriteSD_2);
-    //RAK811_sendMessage( "at+send=lorap2p:1234\r\n");
-    RAK811_sendData(buf);
-    alarmTime = false;
-  }
-
-
-  if ((timeCurrent.unixtime() - timeOld.unixtime()) > TIME_SCREEN_ON)
-  {
-    SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
-    rtc.checkIfAlarm(ALARM_1);// сбрасываем флаг ALARM_1
-    attachInterrupt(INT_ALARM, isrAlarm, FALLING); // прерывание от RTC
-    attachInterrupt(INT_BUTTON, isrButtonPressed, FALLING); // прерывание от button
-    lcd.clear();
-    lcd.setInverted(false);
-    lcd.setCursor(0, 2);
-    lcd.print("Sleep");
-    sleep_mode(); // Переводим МК в сон
-    lcd.clear();
-    lcd.print("Wakeup");
-  }
-  else
-  {
-    // читаем время RTC раз в секунду
-    timeDelay = millis();
-    if ((timeDelay - timeDelayOld) > 1000)
+    if (true == pressAnyButton)
     {
-      timeCurrent = RTClib::now();  // чтение текущего времени
-      timeDelayOld = timeDelay;
-
+        timeCurrent = RTClib::now();  // чтение текущего времени
+        LCDShow();
+        pressAnyButton = false;
+        timeOld = timeCurrent;
+        timeDelay = millis();
+        timeDelayOld = timeDelay;
     }
-  }
+
+    if (true == alarmTime)
+    {
+        ReadSensors();
+        write2sd();
+
+        alarmTime = false;
+    }
+
+    if (true == alarmTimeGSM)
+    {
+        char buf[256];
+        char str_temp_t1[10];
+        char str_temp_Hum[10];
+        char str_temp_P[10];
+        char str_temp_Vbat[10];
+        
+        dtostrf(t1, 3, 1, str_temp_t1);
+        dtostrf(humidity, 3, 1, str_temp_Hum);
+        dtostrf(pressurePascals, 6, 1, str_temp_P);
+        dtostrf(vbat, 4, 2, str_temp_Vbat);
+        snprintf(buf, 256, "%2d.%2d.%2d|%2d:%2d:%2d|t1=%5s|Hum=%5s|P=%6s|Vbat=%4s|Cnt_1=%u|Cnt_2=%u", menuDate.date.day, menuDate.date.month, menuDate.date.year, \
+                 menuTime.time.hour, menuTime.time.minute, menuTime.time.second, str_temp_t1, str_temp_Hum, str_temp_P, str_temp_Vbat, cntWriteSD_1, cntWriteSD_2);
+        
+        RAK811_setState( WAKE_UP );
+        delay(2000);
+        RAK811_init();
+        RAK811_confMode(RAK811_MODE_LORA_P2P);
+        delay(500);
+        RAK811_confP2Pprm("869525000", 12, 0, 1, 8, 20);
+        delay(500);
+        RAK811_confTransferMode(RAK811_SENDER_MODE);
+        delay(500);
+                
+        RAK811_sendData(buf);
+        alarmTimeGSM = false;
+    }
+
+
+    if ((timeCurrent.unixtime() - timeOld.unixtime()) > TIME_SCREEN_ON)
+    {
+        SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+        rtc.checkIfAlarm(ALARM_1);// сбрасываем флаг ALARM_1
+        rtc.checkIfAlarm(ALARM_2);// сбрасываем флаг ALARM_2
+        attachInterrupt(INT_ALARM, isrAlarm, FALLING); // прерывание от RTC
+        attachInterrupt(INT_BUTTON, isrButtonPressed, FALLING); // прерывание от button
+        lcd.clear();
+        lcd.setInverted(false);
+        lcd.setCursor(0, 2);
+        lcd.print("Sleep");
+        sleep_mode(); // Переводим МК в сон
+        lcd.clear();
+        if (true == alarmTime)
+        {
+            lcd.print("Writing to SD");
+        }
+        else if (true == alarmTimeGSM)
+        {
+            lcd.print("Sending to Lora");
+        }
+        else
+        {
+            lcd.print("Wakeup");    
+        }
+        
+    }
+    else
+    {
+        // читаем время RTC раз в секунду
+        timeDelay = millis();
+        if ((timeDelay - timeDelayOld) > 1000)
+        {
+            timeCurrent = RTClib::now();  // чтение текущего времени
+            timeDelayOld = timeDelay;
+
+        }
+    }
 
 
 }
@@ -244,12 +238,17 @@ void loop()
 /********************************обработчик аппаратного прерывания********************/
 void isrAlarm()
 {
-
-  Serial.println("\r\nisr RTC");
-  alarmTime = true;
+    if (rtc.checkIfAlarm(Alarm_1))
+    {
+        alarmTime = true;
+        Serial.println("\r\nisr RTC Alarm 1");
+    }
+    if(rtc.checkIfAlarm(Alarm_2))
+    {
+        alarmTimeGSM = true;
+        Serial.println("\r\nisr RTC Alarm GSM");
+    }        
 }
-
-
 
 
 
@@ -258,8 +257,6 @@ void isrAlarm()
 void isrButtonPressed()
 {
   Serial.println("\r\nisr Button");
-
-  //RAK811_sendMessage(RAK811_FirstPartStrToSend);
 
   ADCSRA |= (1 << ADEN);
   buttonNum = whbuttonPressed();
