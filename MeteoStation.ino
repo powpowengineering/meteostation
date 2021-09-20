@@ -21,6 +21,7 @@
 DATE_MENU_SCREEN menuDate;
 TIME_MENU_SCREEN menuTime;
 ALARM_MENU_SCREEN menuAlarm;
+ALARM_MENU_SCREEN menuAlarmGSM;
 
 bool alarmTime = false;
 byte buttonNum = 0;     // какая кнопка нажата
