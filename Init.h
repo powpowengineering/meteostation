@@ -9,6 +9,7 @@
 #define INT_BUTTON        5// arduino pin 18, real int = int3
 
 #define ALARM_1           1
+#define ALARM_2           2
 #define NUMBER_ROWS_SCREEN        (6)
 
 #define BUTTON_PIN                (A0)
@@ -135,6 +136,7 @@ extern TIME_MENU_SCREEN menuTime;
 extern ALARM_MENU_SCREEN menuAlarm;
 extern ALARM_MENU_SCREEN menuAlarmGSM;
 extern bool alarmTime;
+extern bool alarmTimeGSM ;
 extern byte buttonNum;
 extern bool pressAnyButton;
 extern char screenValue[NUMBER_SHOW_PARAM][LCD_NUM_SYMBOL_IN_ROW];
