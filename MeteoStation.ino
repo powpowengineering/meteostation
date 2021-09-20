@@ -83,61 +83,66 @@ Nokia_LCD lcd(PIN_CLK_LCD /* CLK */, PIN_CLK_DIN /* DIN */, PIN_CLK_DC /* DC */,
 
 void setup()
 {
-  //#ifdef DEBUG
-  Serial.begin(9600); // открываем последовательный порт для мониторинга действий в программе
-  //#endif
-  Wire.begin();// Start the I2C interface
+    //#ifdef DEBUG
+    Serial.begin(9600); // открываем последовательный порт для мониторинга действий в программе
+    //#endif
+    Wire.begin();// Start the I2C interface
 
-  lcd.begin(); //initialize screen
-  lcd.setBacklight(true);
-  lcd.setContrast(60);
-  lcd.clear(true);
-  delay(500);
-  lcd.clear();
-  lcd.setBacklight(false);
-  lcd.setCursor(0, 5);
+    lcd.begin(); //initialize screen
+    lcd.setBacklight(true);
+    lcd.setContrast(60);
+    lcd.clear(true);
+    delay(500);
+    lcd.clear();
+    lcd.setBacklight(false);
+    lcd.setCursor(0, 5);
 
-  pinMode(PIN_INT_ALARM, INPUT);// пин для внешнего прерывания от RTC
-  pinMode(PIN_INT_BUTTON, INPUT);// пин для внешнего прерывания от button
-  pinMode(PIN_CS_SD_CARD_1, OUTPUT);
-  pinMode(PIN_CS_SD_CARD_2, OUTPUT);
-  pinMode(53, OUTPUT);
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN); // настройка режима сна
+    pinMode(PIN_INT_ALARM, INPUT);// пин для внешнего прерывания от RTC
+    pinMode(PIN_INT_BUTTON, INPUT);// пин для внешнего прерывания от button
+    pinMode(PIN_CS_SD_CARD_1, OUTPUT);
+    pinMode(PIN_CS_SD_CARD_2, OUTPUT);
+    pinMode(53, OUTPUT);
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN); // настройка режима сна
 
-  sensors.begin();//датчики температуры
-  sensors.setResolution(t1_deviceAddress, 12, true);
-  sensors.setResolution(t2_deviceAddress, 12, true);
-  sensors.setResolution(t3_deviceAddress, 12, true);
+    sensors.begin();//датчики температуры
+    sensors.setResolution(t1_deviceAddress, 12, true);
+    sensors.setResolution(t2_deviceAddress, 12, true);
+    sensors.setResolution(t3_deviceAddress, 12, true);
 
-  barometer.begin(Wire, LPS25HB_I2C_ADDR_ALT);
+    barometer.begin(Wire, LPS25HB_I2C_ADDR_ALT);
 
-  humidity_sensor.begin();
+    humidity_sensor.begin();
 
-  rtc.setSecond(BUILD_SEC);    // устанавливаем секунд
-  rtc.setMinute(BUILD_MIN);    // установка минут
-  rtc.setHour(BUILD_HOUR);     //установка часов
-  rtc.setDate(BUILD_DAY);     // устанавливаем число
-  rtc.setMonth(BUILD_MONTH);   // Устанавливаем месяц
-  rtc.setYear(BUILD_YEAR - 2000);  // Устанавливаем год
-  rtc.setClockMode(false);    // установка режима 12/24h. True is 12-h, false is 24-hour.
+    rtc.setSecond(BUILD_SEC);    // устанавливаем секунд
+    rtc.setMinute(BUILD_MIN);    // установка минут
+    rtc.setHour(BUILD_HOUR);     //установка часов
+    rtc.setDate(BUILD_DAY);     // устанавливаем число
+    rtc.setMonth(BUILD_MONTH);   // Устанавливаем месяц
+    rtc.setYear(BUILD_YEAR - 2000);  // Устанавливаем год
+    rtc.setClockMode(false);    // установка режима 12/24h. True is 12-h, false is 24-hour.
 
-  timeCurrent = RTClib::now();  // чтение текущего времени
-  menuDate.date.day = timeCurrent.day();
-  menuDate.date.month = timeCurrent.month();
-  menuDate.date.year =  timeCurrent.year() - 2000;
+    timeCurrent = RTClib::now();  // чтение текущего времени
+    menuDate.date.day = timeCurrent.day();
+    menuDate.date.month = timeCurrent.month();
+    menuDate.date.year =  timeCurrent.year() - 2000;
 
-  menuAlarm.alarm.scale = MIN;
-  menuAlarm.alarm.period = 15;
+    menuAlarm.alarm.scale = MIN;
+    menuAlarm.alarm.period = 15;
 
+    menuAlarmGSM.scale = HOUR;
+    menuAlarmGSM.period = 3;  
 
-  SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
-  rtc.turnOnAlarm(1);
+    SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+    SetAlarm2(menuAlarmGSM.scale, menuAlarmGSM.period);
+    
+    rtc.turnOnAlarm(ALARM_1);
+    rtc.turnOnAlarm(ALARM_2);
 
-  attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
-  attachInterrupt(INT_BUTTON, isrButtonPressed, FALLING); // прерывание от button
-  
-  ReadSensors();
-  pressAnyButton = true;
+    attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
+    attachInterrupt(INT_BUTTON, isrButtonPressed, FALLING); // прерывание от button
+
+    ReadSensors();
+    pressAnyButton = true;
 
 }
 
@@ -157,7 +162,7 @@ void loop()
     {
         ReadSensors();
         write2sd();
-
+        SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
         alarmTime = false;
     }
 
@@ -187,13 +192,15 @@ void loop()
         delay(500);
                 
         RAK811_sendData(buf);
+        SetAlarm2(menuAlarmGSM.alarm.scale, menuAlarmGSM.alarm.period);
         alarmTimeGSM = false;
     }
 
 
     if ((timeCurrent.unixtime() - timeOld.unixtime()) > TIME_SCREEN_ON)
-    {
-        SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+    {      
+        rtc.turnOnAlarm(ALARM_1);
+        rtc.turnOnAlarm(ALARM_2);
         rtc.checkIfAlarm(ALARM_1);// сбрасываем флаг ALARM_1
         rtc.checkIfAlarm(ALARM_2);// сбрасываем флаг ALARM_2
         attachInterrupt(INT_ALARM, isrAlarm, FALLING); // прерывание от RTC
