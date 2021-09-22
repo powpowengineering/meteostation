@@ -231,21 +231,24 @@ void loop()
 			lcd.clear();
         }
 		
-        if(true == rtc.checkIfAlarm(ALARM_1))
+        if((true == rtc.checkIfAlarm(ALARM_1)) || (true == rtc.checkIfAlarm(ALARM_2)))
         {
-            rtc.turnOffAlarm(ALARM_1);
-            rtc.clearFlagAlarm(ALARM_1);
-            alarmTime = true;
-		    lcd.print("Writing to SD");
-            Serial.println("\r\nisr Writing to SD");
-        }
-        if(true == rtc.checkIfAlarm(ALARM_2))
-        {
-            rtc.turnOffAlarm(ALARM_2);
-            rtc.clearFlagAlarm(ALARM_2);
-            alarmTimeGSM = true;
-		    lcd.print("Sending to Lora");
-            Serial.println("\r\nisr Sending to Lora");
+            if(true == rtc.checkIfAlarm(ALARM_1))
+            {
+                rtc.turnOffAlarm(ALARM_1);
+                rtc.clearFlagAlarm(ALARM_1);
+                alarmTime = true;
+                lcd.println("Writing to SD");
+                Serial.println("\r\nisr Writing to SD");
+            }
+            if(true == rtc.checkIfAlarm(ALARM_2))
+            {
+                rtc.turnOffAlarm(ALARM_2);
+                rtc.clearFlagAlarm(ALARM_2);
+                alarmTimeGSM = true;
+                lcd.print("Sending to    Lora");
+                Serial.println("\r\nisr Sending to Lora");
+            }
         }
         else
         {
