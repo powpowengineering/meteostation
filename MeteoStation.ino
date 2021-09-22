@@ -113,6 +113,8 @@ void setup()
 
     humidity_sensor.begin();
 
+    RAK811_setState( SLEEP );
+
     rtc.setSecond(BUILD_SEC);    // устанавливаем секунд
     rtc.setMinute(BUILD_MIN);    // установка минут
     rtc.setHour(BUILD_HOUR);     //установка часов
@@ -129,18 +131,15 @@ void setup()
     menuAlarm.alarm.scale = MIN;
     menuAlarm.alarm.period = 15;
 
-    menuAlarmGSM.scale = HOUR;
-    menuAlarmGSM.period = 3;  
+    menuAlarmGSM.alarm.scale = HOURS;
+    menuAlarmGSM.alarm.period = 3;   
 
-    SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
-    SetAlarm2(menuAlarmGSM.scale, menuAlarmGSM.period);
-    
-    rtc.turnOnAlarm(ALARM_1);
-    rtc.turnOnAlarm(ALARM_2);
+	rtc.turnOffAlarm(ALARM_1);
+	rtc.turnOffAlarm(ALARM_2);
 
     attachInterrupt(INT_ALARM, isrAlarm, FALLING);  // прерывание от RTC
     attachInterrupt(INT_BUTTON, isrButtonPressed, FALLING); // прерывание от button
-
+    
     ReadSensors();
     pressAnyButton = true;
 
@@ -162,7 +161,6 @@ void loop()
     {
         ReadSensors();
         write2sd();
-        SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
         alarmTime = false;
     }
 
@@ -189,35 +187,65 @@ void loop()
         RAK811_confP2Pprm("869525000", 12, 0, 1, 8, 20);
         delay(500);
         RAK811_confTransferMode(RAK811_SENDER_MODE);
-        delay(500);
-                
+        delay(500);        
         RAK811_sendData(buf);
-        SetAlarm2(menuAlarmGSM.alarm.scale, menuAlarmGSM.alarm.period);
+        delay(3000);
+        RAK811_setState( SLEEP );
         alarmTimeGSM = false;
     }
 
 
     if ((timeCurrent.unixtime() - timeOld.unixtime()) > TIME_SCREEN_ON)
     {      
-        rtc.turnOnAlarm(ALARM_1);
-        rtc.turnOnAlarm(ALARM_2);
-        rtc.checkIfAlarm(ALARM_1);// сбрасываем флаг ALARM_1
-        rtc.checkIfAlarm(ALARM_2);// сбрасываем флаг ALARM_2
         attachInterrupt(INT_ALARM, isrAlarm, FALLING); // прерывание от RTC
         attachInterrupt(INT_BUTTON, isrButtonPressed, FALLING); // прерывание от button
-        lcd.clear();
-        lcd.setInverted(false);
-        lcd.setCursor(0, 2);
-        lcd.print("Sleep");
-        sleep_mode(); // Переводим МК в сон
-        lcd.clear();
-        if (true == alarmTime)
+        
+        if (false == rtc.checkAlarmEnabled(ALARM_1))
         {
-            lcd.print("Writing to SD");
+            Serial.println("\r\nSet ALARM_1");
+			SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+            rtc.clearFlagAlarm(ALARM_1);
+            rtc.turnOnAlarm(ALARM_1);
+        }     
+        if (false == rtc.checkAlarmEnabled(ALARM_2))
+        {
+            Serial.println("\r\nSet ALARM_2");
+			SetAlarm2(menuAlarmGSM.alarm.scale, menuAlarmGSM.alarm.period);
+            rtc.clearFlagAlarm(ALARM_2);
+            rtc.turnOnAlarm(ALARM_2);
         }
-        else if (true == alarmTimeGSM)
+        
+       
+	    if (!((true == rtc.checkIfAlarm(ALARM_1)) || (true == rtc.checkIfAlarm(ALARM_2))))
+		{
+			lcd.clear();
+			lcd.setInverted(false);
+			lcd.setCursor(0, 2);
+			lcd.print("Sleep");
+			
+			sleep_mode(); // Переводим МК в сон
+			if (pressAnyButton != true)
+			{
+				delay(3000);
+			}
+			lcd.clear();
+        }
+		
+        if(true == rtc.checkIfAlarm(ALARM_1))
         {
-            lcd.print("Sending to Lora");
+            rtc.turnOffAlarm(ALARM_1);
+            rtc.clearFlagAlarm(ALARM_1);
+            alarmTime = true;
+		    lcd.print("Writing to SD");
+            Serial.println("\r\nisr Writing to SD");
+        }
+        if(true == rtc.checkIfAlarm(ALARM_2))
+        {
+            rtc.turnOffAlarm(ALARM_2);
+            rtc.clearFlagAlarm(ALARM_2);
+            alarmTimeGSM = true;
+		    lcd.print("Sending to Lora");
+            Serial.println("\r\nisr Sending to Lora");
         }
         else
         {
@@ -245,16 +273,7 @@ void loop()
 /********************************обработчик аппаратного прерывания********************/
 void isrAlarm()
 {
-    if (rtc.checkIfAlarm(Alarm_1))
-    {
-        alarmTime = true;
-        Serial.println("\r\nisr RTC Alarm 1");
-    }
-    if(rtc.checkIfAlarm(Alarm_2))
-    {
-        alarmTimeGSM = true;
-        Serial.println("\r\nisr RTC Alarm GSM");
-    }        
+    Serial.println("\r\nisr RTC");
 }
 
 

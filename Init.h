@@ -30,7 +30,7 @@
 
 #define LCD_NUMBER_PIXELS_WIDE_SYMBOL   (5)
 
-#define NUMBER_SHOW_PARAM               (11)
+#define NUMBER_SHOW_PARAM               (12)
 
 #define SCREEN_TEMP1_POS                (0)
 #define SCREEN_TEMP2_POS                (1)

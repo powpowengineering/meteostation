@@ -138,6 +138,7 @@ void write2sd(void)
             myFile.print(":");
             myFile.println(timeCurrent.second());
             myFile.close();
+            delay(3000);
         }
         else
         {
@@ -204,6 +205,7 @@ void write2sd(void)
             myFile.print(":");
             myFile.println(timeCurrent.second());
             myFile.close();
+            delay(3000);
         }
         else
         {
@@ -283,12 +285,13 @@ void write2sd(void)
                 else if (SCREEN_ALARM_POS == cursorPos)
                 {
                     menuLCD = ALARM_MENU;
-                     //menuAlarm.state = SCALE; - commented because it was same in pasha's file
+                    menuAlarm.state = SCALE; //- commented because it was same in pasha's file
                     //printCurrentMenuOnLCD(menuLCD);
                 }
                 else if (SCREEN_ALARM_GSM_POS == cursorPos)
                 {
                     menuLCD = ALARM_GSM_MENU;
+					menuAlarmGSM.state = SCALE;
                 }
 				else if ((SCREEN_TEMP1_POS == cursorPos)||(SCREEN_TEMP2_POS == cursorPos)||(SCREEN_TEMP3_POS == cursorPos)\
 						||(SCREEN_HUM_POS == cursorPos)||(SCREEN_PRES_POS == cursorPos)|| (SCREEN_VBAT_POS == cursorPos))
@@ -624,7 +627,7 @@ void write2sd(void)
       printCurrentMenuOnLCD(menuLCD);
     }
 /*--------------------------- ALARM GSM menu ------------------------*/
-    else if (ALARM_MENU == menuLCD)
+    else if (ALARM_GSM_MENU == menuLCD)
     {
 	if (BUTTON_DOWN == buttonNum)// down
       {
@@ -638,20 +641,20 @@ void write2sd(void)
                 else if (menuAlarmGSM.alarm.scale == HOUR)
                 {
                   menuAlarmGSM.alarm.scale = MIN;
-                  menuAlarmGSM.alarm.period = 5; 
+                  menuAlarmGSM.alarm.period = 1;//5 
                 }
           }
           else if (PERIOD == menuAlarmGSM.state)
           {
               if (menuAlarmGSM.alarm.scale == MIN)
               {
-                if (menuAlarmGSM.alarm.period > 5)
+                if (menuAlarmGSM.alarm.period > 1)//5
                 {
                     menuAlarmGSM.alarm.period--;
                 }
                 else 
                 {
-                    menuAlarmGSM.alarm.period = 5;
+                    menuAlarmGSM.alarm.period = 1;//5
                 }
               }
               else if (menuAlarmGSM.alarm.period > 1)
@@ -721,7 +724,7 @@ void write2sd(void)
       }
       else if (BUTTON_SELECT == buttonNum)// select
       {
-         SetAlarm(menuAlarmGSM.alarm.scale, menuAlarmGSM.alarm.period);
+         SetAlarm2(menuAlarmGSM.alarm.scale, menuAlarmGSM.alarm.period);
          menuLCD = MAIN_MENU;
       }
       printCurrentMenuOnLCD(menuLCD);
@@ -1212,6 +1215,16 @@ void SetAlarm(SCALE_enum  s, uint8_t  p)
     al_minutes = minute(nextTimeAlarm);
     al_seconds = second(nextTimeAlarm);
     
+	Serial.print("\r\al_days=");
+	Serial.println(al_days);
+	Serial.print("\r\al_hours=");
+	Serial.println(al_hours);
+	Serial.print("\r\al_minutes=");
+	Serial.println(al_minutes);
+	Serial.print("\r\al_seconds=");
+	Serial.println(al_seconds);
+	
+	
     rtc.setA1Time(al_days,al_hours,al_minutes,al_seconds,0x0, false, false, false);
 }// end of SetAlarm()
 
