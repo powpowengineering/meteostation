@@ -1167,8 +1167,6 @@ float ReadVbat(void)
 
       return voltage;
 
-      sample_count = 0;
-      sum = 0;
 }//end of ReadVbat
 
 
