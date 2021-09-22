@@ -172,6 +172,8 @@ void loop()
         char str_temp_P[10];
         char str_temp_Vbat[10];
         
+		ReadSensors();
+		
         dtostrf(t1, 3, 1, str_temp_t1);
         dtostrf(humidity, 3, 1, str_temp_Hum);
         dtostrf(pressurePascals, 6, 1, str_temp_P);

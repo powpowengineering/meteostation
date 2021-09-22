@@ -544,11 +544,11 @@ void write2sd(void)
           {
               if (menuAlarm.alarm.scale == SEC)
               {
-                if (menuAlarm.alarm.period > 10)
+                if (menuAlarm.alarm.period > 30)
                 {
                   menuAlarm.alarm.period--;
                 }
-                else {menuAlarm.alarm.period=10;}
+                else {menuAlarm.alarm.period=30;}
               }
               if (menuAlarm.alarm.scale == MIN)
               {
@@ -576,19 +576,25 @@ void write2sd(void)
             else if (menuAlarm.alarm.scale == MIN)
             {
               menuAlarm.alarm.scale = SEC;
-              menuAlarm.alarm.period = 10;
+              menuAlarm.alarm.period = 30;
             } else {menuAlarm.alarm.scale = SEC;}
           }
           else if (PERIOD == menuAlarm.state)
           {
-              if ((menuAlarm.alarm.scale == SEC || menuAlarm.alarm.scale == MIN))
+              if (menuAlarm.alarm.scale == SEC)
               {
                 if (menuAlarm.alarm.period<60)
                 {
                   menuAlarm.alarm.period++;
                 }
-                else {menuAlarm.alarm.period = 10;}
+                else {menuAlarm.alarm.period = 30;}
               }
+			  else if (menuAlarm.alarm.scale == MIN)
+				  if (menuAlarm.alarm.period<60)
+                  {
+                    menuAlarm.alarm.period++;
+                  }
+                  else {menuAlarm.alarm.period = 10;}
               else if (menuAlarm.alarm.period<4)
                   {
                     menuAlarm.alarm.period++;
@@ -1110,6 +1116,8 @@ void SetDate(uint8_t  d , uint8_t  m, uint8_t yOff )
     rtc.setDate(d);     // ?????????????????????????? ??????????
     rtc.setMonth(m);   // ?????????????????????????? ??????????
     rtc.setYear(yOff);    // ?????????????????????????? ??????
+		SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+	SetAlarm2(menuAlarmGSM.alarm.scale, menuAlarmGSM.alarm.period);
 }// end of SetDate()
 
 
@@ -1132,6 +1140,8 @@ void SetTime(uint8_t  h, uint8_t  m, uint8_t s)
     rtc.setSecond(s);        // ?????????????????????????? ??????????????
     rtc.setMinute(m);        // ?????????????????????????? ????????????
     rtc.setHour(h);          // ?????????????????????????? ????????
+	SetAlarm(menuAlarm.alarm.scale, menuAlarm.alarm.period);
+	SetAlarm2(menuAlarmGSM.alarm.scale, menuAlarmGSM.alarm.period);
 }// end of SetTime()
 
 //**************************************************************************************************
